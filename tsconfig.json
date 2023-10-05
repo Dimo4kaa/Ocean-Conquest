@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "lib": ["ES6", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "rootDir": "./src/backend",
+    "allowJs": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+    "removeComments": true,
+    "strict": true,
+    "noImplicitAny": true,
+
+    // "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/backend/**/*"],
+  "exclude": ["node_modules"],
+  "lib": ["esnext"],
+  "ts-node": {
+    "esm": true
+  }
+}
