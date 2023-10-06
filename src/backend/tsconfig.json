@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "lib": ["ES6", "DOM"],
+    "module": "NodeNext",
+    "rootDir": "./",
+    "allowJs": true,
+    "sourceMap": true,
+    "outDir": "../../dist",
+    "removeComments": true,
+    "strict": true,
+    "noImplicitAny": true,
+
+    // "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["./**/*"],
+  "exclude": ["node_modules"],
+  "lib": ["esnext"],
+  "ts-node": {
+    "esm": true
+  }
+}

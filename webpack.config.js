@@ -37,14 +37,15 @@ const config = {
     rules: [
       {
         test: /\.tsx?$/,
-        exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
-          // options: {
+          options: {
+            configFile: 'src/frontend/tsconfig.json'
           // disable type checker - we will use it in fork plugin
           // transpileOnly: true,
-          // },
+          },
         },
+        exclude: /node_modules/,
       },
       {
         test: /\.css$/i,

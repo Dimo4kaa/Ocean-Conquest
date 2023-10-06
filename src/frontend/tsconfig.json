@@ -3,11 +3,10 @@
     "target": "es2018",
     "lib": ["ES6", "DOM"],
     "module": "ESNext",
-    "moduleResolution": "Node",
-    "rootDir": "./src/backend",
+    "rootDir": "./",
     "allowJs": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": "../../dist",
     "removeComments": true,
     "strict": true,
     "noImplicitAny": true,
@@ -17,7 +16,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["src/backend/**/*"],
+  "include": ["./**/*"],
   "exclude": ["node_modules"],
   "lib": ["esnext"],
   "ts-node": {

@@ -5,12 +5,13 @@ import { Server } from 'socket.io';
 
 import path from "path"
 import { fileURLToPath } from 'url';
+import { PartyManager } from './modules/PartyManager.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // import { fs } from 'fs';
 // import path from 'path';
 // const PartyManager = require('./src/PartyManager');
-// const pm = new PartyManager();
+const pm = new PartyManager();
 
 // Создание приложения ExpressJS
 const app = express();
@@ -49,12 +50,12 @@ server.listen(port, () => {
 
 // Прослушивание socket соединений
 io.on('connection', (socket) => {
-  // pm.connection(socket);
+  pm.connection(socket);
   io.emit('playerCount', io.engine.clientsCount);
 
   // Отключение коннекта
   socket.on('disconnect', () => {
-    // pm.disconnect(socket);
+    pm.disconnect(socket);
     io.emit('playerCount', io.engine.clientsCount);
   });
 
@@ -117,5 +118,3 @@ io.on('connection', (socket) => {
 //   // 	pm.playRandom(socket);
 //   // });
 // });
-
-console.log('123');
