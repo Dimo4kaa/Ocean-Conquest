@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2018",
     "lib": ["ES6", "DOM"],
-    "module": "ESNext",
+    "module": "CommonJS",
     "rootDir": "./",
     "allowJs": true,
     "sourceMap": true,

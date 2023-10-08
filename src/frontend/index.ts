@@ -10,5 +10,5 @@ const app = new Application({
   computer: ComputerScene,
   online: OnlineScene,
 });
-
+//перенести в конец конструктора Application?
 app.start('preparation');

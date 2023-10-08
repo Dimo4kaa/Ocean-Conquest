@@ -172,9 +172,10 @@ export class Battlefield {
   }
 
   removeAllShips() {
-    const ships = this.ships.slice();
-
+    const ships = this.ships;
+    console.log(ships);
     for (const ship of ships) {
+      console.log(ship);
       this.removeShip(ship);
     }
 
@@ -245,6 +246,8 @@ export class Battlefield {
 
   removeAllShots() {
     const shots = this.shots.slice();
+    console.log(this.shots)
+    console.log(this.shots.slice())
 
     for (const shot of shots) {
       this.removeShot(shot);

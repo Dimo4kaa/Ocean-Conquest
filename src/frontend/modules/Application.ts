@@ -1,10 +1,11 @@
-import { io } from '../../../node_modules/socket.io-client/build/esm/index';
+import { io, Socket } from 'socket.io-client';
+import { ClientToServerEvents, ServerToClientEvents } from './interfaces';
 import { BattlefieldView } from './BattlefieldView';
-import { Mouse } from './Mouse';
 import { ShipView } from './ShipView';
+import { Mouse } from './Mouse';
 
 export class Application {
-  socket: any;
+  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
   mouse: Mouse;
 
   player: BattlefieldView;
@@ -72,14 +73,15 @@ export class Application {
 
   //!!!
   start(sceneName: any, ...args: any) {
+    //если запускаем туже сцену
     if (this.activeScene && this.activeScene.name === sceneName) {
       return false;
     }
-
+    //если такой сцены нет
     if (!this.scenes.hasOwnProperty(sceneName)) {
       return false;
     }
-
+    //если есть какая-тто активная сцена, то остановливаем её
     if (this.activeScene) {
       this.activeScene.stop();
     }
