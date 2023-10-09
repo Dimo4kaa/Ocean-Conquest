@@ -188,7 +188,7 @@ export class Battlefield {
     const { x, y } = shot;
 
     if (matrix[y][x].ship) {
-      shot.setVariant('wounded');
+      shot.('wounded');
 
       const { ship } = matrix[y][x];
       const dx = ship.direction === 'row';

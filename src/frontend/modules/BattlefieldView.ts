@@ -1,6 +1,6 @@
 import { Battlefield } from './Battlefield';
 import { ShipView } from './ShipView';
-import { ShotView } from './ShotView';
+import { Shot } from './Shot';
 import { isUnderPoint } from './utils';
 
 export class BattlefieldView extends Battlefield {
@@ -111,12 +111,11 @@ export class BattlefieldView extends Battlefield {
     return isUnderPoint(point, this.root);
   }
 
-  addShot(shot: ShotView) {
+  addShot(shot: Shot) {
     if (!super.addShot(shot)) {
       return false;
     }
 
-    this.polygon.append(shot.div);
 
     const cell = this.cells[shot.y][shot.x];
     const cellRect = cell.getBoundingClientRect();
@@ -124,11 +123,13 @@ export class BattlefieldView extends Battlefield {
 
     shot.div.style.left = `${cellRect.left - rootRect.left}px`;
     shot.div.style.top = `${cellRect.top - rootRect.top}px`;
+    
+    this.polygon.append(shot.div);
 
     return true;
   }
 
-  removeShot(shot: ShotView) {
+  removeShot(shot: Shot) {
     if (!super.removeShot(shot)) {
       return false;
     }

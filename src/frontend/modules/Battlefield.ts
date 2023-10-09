@@ -1,11 +1,11 @@
 import { Ship } from './Ship';
 import { ShipView } from './ShipView';
-import { ShotView } from './ShotView';
+import { Shot } from './Shot';
 import { getRandomBetween, getRandomFrom } from './utils';
 
 export class Battlefield {
   ships: ShipView[] = [];
-  shots: ShotView[] = [];
+  shots: Shot[] = [];
 
   _private_matrix: any = null;
   _private_changed: any = true;
@@ -172,17 +172,15 @@ export class Battlefield {
   }
 
   removeAllShips() {
-    const ships = this.ships;
-    console.log(ships);
+    const ships = this.ships.slice();
     for (const ship of ships) {
-      console.log(ship);
       this.removeShip(ship);
     }
 
     return ships.length;
   }
 
-  addShot(shot: ShotView) {
+  addShot(shot: Shot) {
     for (const { x, y } of this.shots) {
       if (x === shot.x && y === shot.y) {
         return false;
@@ -232,7 +230,7 @@ export class Battlefield {
     return true;
   }
 
-  removeShot(shot: ShotView) {
+  removeShot(shot: Shot) {
     if (!this.shots.includes(shot)) {
       return false;
     }
@@ -246,8 +244,6 @@ export class Battlefield {
 
   removeAllShots() {
     const shots = this.shots.slice();
-    console.log(this.shots)
-    console.log(this.shots.slice())
 
     for (const shot of shots) {
       this.removeShot(shot);

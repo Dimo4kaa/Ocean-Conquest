@@ -1,6 +1,6 @@
-import { Scene } from "../Scene";
-import { ShotView } from "../ShotView";
-import { addListener, isUnderPoint } from "../utils";
+import { Scene } from '../Scene';
+import { Shot } from '../Shot';
+import { addListener, isUnderPoint } from '../utils';
 
 export class OnlineScene extends Scene {
   actionsBar: HTMLDivElement;
@@ -34,7 +34,7 @@ export class OnlineScene extends Scene {
     });
 
     socket.on('addShot', ({ x, y, variant }) => {
-      const shot = new ShotView(x, y, variant);
+      const shot = new Shot(x, y, variant);
 
       if (this.ownTurn) {
         this.app.opponent.addShot(shot);
@@ -47,14 +47,14 @@ export class OnlineScene extends Scene {
       player.removeAllShots();
 
       for (const { x, y, variant } of ownShots) {
-        const shot = new ShotView(x, y, variant);
+        const shot = new Shot(x, y, variant);
         player.addShot(shot);
       }
 
       opponent.removeAllShots();
 
       for (const { x, y, variant } of opponentShots) {
-        const shot = new ShotView(x, y, variant);
+        const shot = new Shot(x, y, variant);
         opponent.addShot(shot);
       }
     });

@@ -1,6 +1,6 @@
 import { Scene } from '../Scene';
 import { ShipView } from '../ShipView';
-import { ShotView } from '../ShotView';
+import { Shot } from '../Shot';
 import { addListener, getRandomBetween, isUnderPoint } from '../utils';
 
 export class ComputerScene extends Scene {
@@ -86,7 +86,7 @@ export class ComputerScene extends Scene {
           const x = parseInt(cell.dataset.x!);
           const y = parseInt(cell.dataset.y!);
 
-          const shot = new ShotView(x, y);
+          const shot = new Shot(x, y);
           const result = opponent.addShot(shot);
 
           if (result) {
@@ -110,7 +110,7 @@ export class ComputerScene extends Scene {
       }
 
       if (!inUntouchable) {
-        const shot = new ShotView(x, y);
+        const shot = new Shot(x, y);
         const result = player.addShot(shot);
 
         if (result) {
