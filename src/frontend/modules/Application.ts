@@ -1,8 +1,8 @@
 import { io, Socket } from 'socket.io-client';
 import { ClientToServerEvents, ServerToClientEvents } from './interfaces';
 import { BattlefieldView } from './BattlefieldView';
-import { ShipView } from './ShipView';
 import { Mouse } from './Mouse';
+import { Ship } from './Ship';
 
 export class Application {
   socket: Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -51,7 +51,7 @@ export class Application {
       player.clear();
 
       for (const { size, direction, x, y } of ships) {
-        const ship = new ShipView(size, direction);
+        const ship = new Ship(size, direction);
         player.addShip(ship, x, y);
       }
 

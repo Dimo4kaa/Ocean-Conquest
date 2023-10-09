@@ -1,5 +1,5 @@
 import { Battlefield } from './Battlefield';
-import { ShipView } from './ShipView';
+import { Ship } from './Ship';
 import { Shot } from './Shot';
 import { isUnderPoint } from './utils';
 
@@ -70,7 +70,7 @@ export class BattlefieldView extends Battlefield {
     }
   }
 
-  addShip(ship: ShipView, x: number, y: number) {
+  addShip(ship: Ship, x: number, y: number) {
     if (!super.addShip(ship, x, y)) {
       return false;
     }
@@ -95,7 +95,7 @@ export class BattlefieldView extends Battlefield {
     return true;
   }
 
-  removeShip(ship: ShipView) {
+  removeShip(ship: Ship) {
     if (!super.removeShip(ship)) {
       return false;
     }
@@ -116,14 +116,13 @@ export class BattlefieldView extends Battlefield {
       return false;
     }
 
-
     const cell = this.cells[shot.y][shot.x];
     const cellRect = cell.getBoundingClientRect();
     const rootRect = this.root.getBoundingClientRect();
 
     shot.div.style.left = `${cellRect.left - rootRect.left}px`;
     shot.div.style.top = `${cellRect.top - rootRect.top}px`;
-    
+
     this.polygon.append(shot.div);
 
     return true;

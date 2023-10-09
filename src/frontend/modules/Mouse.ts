@@ -10,12 +10,6 @@ export class Mouse {
   pX!: number;
   pY!: number;
 
-  // x = null;
-  // y = null;
-
-  // pX = null;
-  // pY = null;
-
   left = false;
   pLeft = false;
 

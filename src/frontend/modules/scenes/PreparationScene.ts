@@ -1,5 +1,5 @@
 import { Scene } from '../Scene';
-import { ShipView } from '../ShipView';
+import { Ship } from '../Ship';
 import { addListener, getRandomSeveral, isUnderPoint } from '../utils';
 
 const shipDatas = [
@@ -16,7 +16,7 @@ const shipDatas = [
 ];
 
 export class PreparationScene extends Scene {
-  draggedShip: ShipView | null = null;
+  draggedShip: Ship | null = null;
   draggedOffsetX = 0;
   draggedOffsetY = 0;
   //!!!???
@@ -160,7 +160,7 @@ export class PreparationScene extends Scene {
   randomize() {
     const { player } = this.app;
     //!!!???
-    player.randomize(ShipView);
+    player.randomize(Ship);
 
     for (let i = 0; i < 10; i++) {
       const ship = player.ships[i];
@@ -176,7 +176,7 @@ export class PreparationScene extends Scene {
     player.removeAllShips();
 
     for (const { size, direction, startX, startY } of shipDatas) {
-      const ship = new ShipView(size, direction, startX, startY);
+      const ship = new Ship(size, direction, startX, startY);
       //!!!???
       player.addShip(ship);
     }

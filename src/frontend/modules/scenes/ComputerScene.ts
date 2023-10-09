@@ -1,5 +1,5 @@
 import { Scene } from '../Scene';
-import { ShipView } from '../ShipView';
+import { Ship } from '../Ship';
 import { Shot } from '../Shot';
 import { addListener, getRandomBetween, isUnderPoint } from '../utils';
 
@@ -21,7 +21,7 @@ export class ComputerScene extends Scene {
 
     opponent.clear();
     //!!!
-    opponent.randomize(ShipView);
+    opponent.randomize(Ship);
 
     this.untouchables = untouchables;
 

@@ -1,10 +1,9 @@
 import { Ship } from './Ship';
-import { ShipView } from './ShipView';
 import { Shot } from './Shot';
 import { getRandomBetween, getRandomFrom } from './utils';
 
 export class Battlefield {
-  ships: ShipView[] = [];
+  ships: Ship[] = [];
   shots: Shot[] = [];
 
   _private_matrix: any = null;
@@ -117,11 +116,7 @@ export class Battlefield {
     return 0 <= x && x < 10 && 0 <= y && y < 10;
   }
 
-  addShip(ship: ShipView, x: number, y: number) {
-    if (this.ships.includes(ship)) {
-      return false;
-    }
-
+  addShip(ship: Ship, x: number, y: number) {
     this.ships.push(ship);
 
     if (this.inField(x, y)) {
@@ -156,7 +151,7 @@ export class Battlefield {
     return true;
   }
 
-  removeShip(ship: ShipView) {
+  removeShip(ship: Ship) {
     if (!this.ships.includes(ship)) {
       return false;
     }
