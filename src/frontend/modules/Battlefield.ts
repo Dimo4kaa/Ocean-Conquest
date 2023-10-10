@@ -339,14 +339,14 @@ export class Battlefield {
   }
 
   //!!!???
-  randomize(ShipClass: any = Ship) {
+  randomize() {
     this.removeAllShips();
 
     for (let size = 4; size >= 1; size--) {
       for (let n = 0; n < 5 - size; n++) {
         const direction = getRandomFrom('row', 'column');
         //!!!
-        const ship: any = new ShipClass(size, direction);
+        const ship: any = new Ship(size, direction);
 
         while (!ship.placed) {
           const x = getRandomBetween(0, 9);

@@ -104,7 +104,7 @@ export class OnlineScene extends Scene {
 
     this.removeEventListeners = [];
 
-    const input = chat.querySelector('input');
+    const input = chat.querySelector('input')!;
     this.removeEventListeners.push(
       addListener(input, 'keydown', (e) => {
         if (e.key === 'Enter' && input.value) {
@@ -187,8 +187,8 @@ export class OnlineScene extends Scene {
         cell.classList.add('battlefield-item__active');
 
         if (mouse.left && !mouse.pLeft) {
-          const x = parseInt(cell.dataset.x);
-          const y = parseInt(cell.dataset.y);
+          const x = parseInt(cell.dataset.x!);
+          const y = parseInt(cell.dataset.y!);
 
           socket.emit('addShot', x, y);
         }

@@ -160,7 +160,7 @@ export class PreparationScene extends Scene {
   randomize() {
     const { player } = this.app;
     //!!!???
-    player.randomize(Ship);
+    player.randomize();
 
     for (let i = 0; i < 10; i++) {
       const ship = player.ships[i];

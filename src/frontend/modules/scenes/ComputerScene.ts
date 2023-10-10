@@ -21,7 +21,7 @@ export class ComputerScene extends Scene {
 
     opponent.clear();
     //!!!
-    opponent.randomize(Ship);
+    opponent.randomize();
 
     this.untouchables = untouchables;
 
