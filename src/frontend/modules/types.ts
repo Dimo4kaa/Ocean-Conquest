@@ -1,3 +1,5 @@
+import { Ship } from "./Ship";
+
 export type matrixItem = {
   x: number;
   y: number;

@@ -86,7 +86,7 @@ export class PreparationScene extends Scene {
 
     // Потенциально хотим начать тянуть корабль
     if (!this.draggedShip && mouse.left && !mouse.pLeft) {
-      const ship = player.ships.find((ship) => ship.isUnder(mouse));
+      const ship = player.ships.find((ship) => isUnderPoint(mouse, ship.div));
 
       if (ship) {
         const shipRect = ship.div.getBoundingClientRect();

@@ -81,7 +81,6 @@ export class Battlefield {
   }
 
   get matrix() {
-    console.log('MATRIX!')
     const matrix: matrixItem[][] = [];
 
     for (let y = 0; y < 10; y++) {
@@ -164,6 +163,7 @@ export class Battlefield {
 
   addShip(ship: Ship, x?: number, y?: number) {
     this.ships.push(ship);
+    const matrix = this.matrix;
 
     if (this.inField(x, y)) {
       const dx = ship.direction === 'row';
@@ -181,7 +181,7 @@ export class Battlefield {
           break;
         }
 
-        const item = this.matrix[cy][cx];
+        const item = matrix[cy][cx];
         if (!item.free) {
           placed = false;
           break;
@@ -348,10 +348,6 @@ export class Battlefield {
   clear() {
     this.removeAllShots();
     this.removeAllShips();
-  }
-
-  isUnder(point: any) {
-    return isUnderPoint(point, this.root);
   }
 
   inField(x: any, y: any) {

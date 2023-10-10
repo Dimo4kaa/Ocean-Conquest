@@ -182,7 +182,7 @@ export class OnlineScene extends Scene {
       return;
     }
 
-    if (opponent.isUnder(mouse)) {
+    if (isUnderPoint(mouse, opponent.root)) {
       const cell = opponent.cells.flat().find((cell) => isUnderPoint(mouse, cell));
 
       if (cell) {

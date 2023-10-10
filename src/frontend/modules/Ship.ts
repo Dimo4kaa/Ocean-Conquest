@@ -43,9 +43,4 @@ export class Ship {
     const newDirection = this.direction === 'row' ? 'column' : 'row';
     this.setDirection(newDirection);
   }
-
-  //!!!
-  isUnder(point: any) {
-    return isUnderPoint(point, this.div);
-  }
 }
