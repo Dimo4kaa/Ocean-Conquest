@@ -1,13 +1,77 @@
 import { Ship } from './Ship';
 import { Shot } from './Shot';
-import { getRandomBetween, getRandomFrom } from './utils';
+import { getRandomBetween, getRandomFrom, isUnderPoint } from './utils';
 
 export class Battlefield {
   ships: Ship[] = [];
   shots: Shot[] = [];
-
+  //TYPES
   _private_matrix: any = null;
   _private_changed: any = true;
+
+  root: HTMLDivElement;
+  table: HTMLTableElement;
+  dock: HTMLDivElement;
+  polygon: HTMLDivElement;
+  showShips: boolean;
+
+  cells: HTMLTableCellElement[][] = [];
+
+  constructor(showShips = true) {
+    this.root = document.createElement('div');
+    this.table = document.createElement('table');
+    this.dock = document.createElement('div');
+    this.polygon = document.createElement('div');
+    this.showShips = showShips;
+
+    const { root, table, dock, polygon } = this;
+
+    root.classList.add('battlefield');
+    table.classList.add('battlefield-table');
+    dock.classList.add('battlefield-dock');
+    polygon.classList.add('battlefield-polygon');
+
+    root.append(table, dock, polygon);
+
+    for (let y = 0; y < 10; y++) {
+      const row: HTMLTableCellElement[] = [];
+      const tr = document.createElement('tr');
+      tr.classList.add('battlefield-row');
+      tr.dataset.y = String(y);
+
+      for (let x = 0; x < 10; x++) {
+        const td = document.createElement('td');
+        td.classList.add('battlefield-item');
+        Object.assign(td.dataset, { x, y });
+
+        tr.append(td);
+        row.push(td);
+      }
+
+      table.append(tr);
+      this.cells.push(row);
+    }
+
+    for (let x = 0; x < 10; x++) {
+      const cell = this.cells[0][x];
+      const marker = document.createElement('div');
+
+      marker.classList.add('marker', 'marker-column');
+      marker.textContent = 'АБВГДЕЖЗИК'[x];
+
+      cell.append(marker);
+    }
+
+    for (let y = 0; y < 10; y++) {
+      const cell = this.cells[y][0];
+      const marker = document.createElement('div');
+
+      marker.classList.add('marker', 'marker-row');
+      marker.textContent = String(y + 1);
+
+      cell.append(marker);
+    }
+  }
 
   get loser() {
     for (const ship of this.ships) {
@@ -104,17 +168,6 @@ export class Battlefield {
 
     return true;
   }
-  //!!!
-  //хуй?
-  inField(x: any, y: any) {
-    const isNumber = (n: any) => parseInt(n) === n && !isNaN(n) && ![Infinity, -Infinity].includes(n);
-
-    if (!isNumber(x) || !isNumber(y)) {
-      return false;
-    }
-
-    return 0 <= x && x < 10 && 0 <= y && y < 10;
-  }
 
   addShip(ship: Ship, x: number, y: number) {
     this.ships.push(ship);
@@ -148,21 +201,45 @@ export class Battlefield {
     }
 
     this._private_changed = true;
+
+    if (this.showShips) {
+      this.dock.append(ship.div);
+
+      if (ship.placed) {
+        const cell = this.cells[y][x];
+        const cellRect = cell.getBoundingClientRect();
+        const rootRect = this.root.getBoundingClientRect();
+
+        ship.div.style.left = `${cellRect.left - rootRect.left}px`;
+        ship.div.style.top = `${cellRect.top - rootRect.top}px`;
+      } else {
+        ship.setDirection('row');
+        ship.div.style.left = `${ship.startX}px`;
+        ship.div.style.top = `${ship.startY}px`;
+      }
+    }
+
     return true;
   }
 
   removeShip(ship: Ship) {
+    //???
     if (!this.ships.includes(ship)) {
       return false;
     }
-
-    const index = this.ships.indexOf(ship);
-    this.ships.splice(index, 1);
 
     ship.x = null;
     ship.y = null;
 
     this._private_changed = true;
+
+    const index = this.ships.indexOf(ship);
+    this.ships.splice(index, 1);
+
+    if (Array.prototype.includes.call(this.dock.children, ship.div)) {
+      ship.div.remove();
+    }
+
     return true;
   }
 
@@ -221,11 +298,20 @@ export class Battlefield {
       }
     }
 
-    this._private_changed = true;
+    const cell = this.cells[shot.y][shot.x];
+    const cellRect = cell.getBoundingClientRect();
+    const rootRect = this.root.getBoundingClientRect();
+
+    shot.div.style.left = `${cellRect.left - rootRect.left}px`;
+    shot.div.style.top = `${cellRect.top - rootRect.top}px`;
+
+    this.polygon.append(shot.div);
+
     return true;
   }
 
   removeShot(shot: Shot) {
+    //???
     if (!this.shots.includes(shot)) {
       return false;
     }
@@ -234,6 +320,11 @@ export class Battlefield {
     this.shots.splice(index, 1);
 
     this._private_changed = true;
+
+    if (Array.prototype.includes.call(this.polygon.children, shot.div)) {
+      shot.div.remove();
+    }
+
     return true;
   }
 
@@ -246,6 +337,7 @@ export class Battlefield {
 
     return shots.length;
   }
+
   //!!!???
   randomize(ShipClass: any = Ship) {
     this.removeAllShips();
@@ -270,5 +362,19 @@ export class Battlefield {
   clear() {
     this.removeAllShots();
     this.removeAllShips();
+  }
+
+  isUnder(point: any) {
+    return isUnderPoint(point, this.root);
+  }
+
+  inField(x: any, y: any) {
+    const isNumber = (n: any) => parseInt(n) === n && !isNaN(n) && ![Infinity, -Infinity].includes(n);
+
+    if (!isNumber(x) || !isNumber(y)) {
+      return false;
+    }
+
+    return 0 <= x && x < 10 && 0 <= y && y < 10;
   }
 }

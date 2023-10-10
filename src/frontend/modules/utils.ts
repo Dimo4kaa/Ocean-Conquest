@@ -7,7 +7,7 @@ export function getRandomFrom<T>(...args: T[]): T {
   return args[index];
 }
 
-export function isUnderPoint(point: any, element: HTMLElement) {
+export function isUnderPoint<T extends { x: number; y: number }>(point: T, element: HTMLElement) {
   const { left, top, width, height } = element.getBoundingClientRect();
   const { x, y } = point;
 
@@ -19,7 +19,7 @@ export function addListener(element: any, ...args: any) {
   return () => element.removeEventListener(...args);
 }
 
-export function getRandomSeveral(array: any[] = [], size = 1) {
+export function getRandomSeveral<T>(array: T[] = [], size = 1): T[] {
   array = array.slice();
 
   if (size > array.length) {

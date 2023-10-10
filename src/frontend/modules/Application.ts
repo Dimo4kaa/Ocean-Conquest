@@ -1,41 +1,39 @@
 import { io, Socket } from 'socket.io-client';
-import { ClientToServerEvents, ServerToClientEvents } from './interfaces';
-import { BattlefieldView } from './BattlefieldView';
+import { Battlefield } from './Battlefield';
 import { Mouse } from './Mouse';
 import { Ship } from './Ship';
+import { PreparationScene } from './scenes/PreparationScene';
+import { ComputerScene } from './scenes/ComputerScene';
+import { OnlineScene } from './scenes/OnlineScene';
 
 export class Application {
-  socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  //!!!
+  socket: Socket;
   mouse: Mouse;
 
-  player: BattlefieldView;
-  opponent: BattlefieldView;
+  player: Battlefield;
+  opponent: Battlefield;
 
-  //!!!
-  scenes: any = {};
+  scenes = {
+    preparation: new PreparationScene('preparation', this),
+    computer: new ComputerScene('computer', this),
+    online: new OnlineScene('online', this),
+  };
   activeScene: any = null;
 
-  constructor(scenes = {}) {
+  constructor() {
     this.mouse = new Mouse(document.body);
-    this.player = new BattlefieldView(true);
-    this.opponent = new BattlefieldView(false);
+    this.player = new Battlefield(true);
+    this.opponent = new Battlefield(false);
     this.socket = io();
 
-    const { opponent, player, socket } = this;
+    const { scenes, opponent, player, socket } = this;
 
     document.querySelector('[data-side="player"]')!.append(player.root);
     document.querySelector('[data-side="opponent"]')!.append(opponent.root);
 
-    for (const [sceneName, SceneClass] of Object.entries(scenes)) {
-      //!!!
-      const SceneClassCopy: any = SceneClass;
-      this.scenes[sceneName] = new SceneClassCopy(sceneName, this);
-    }
-
-    for (const scene of Object.values(this.scenes)) {
-      //!!!
-      const sceneCopy: any = scene;
-      sceneCopy.init();
+    for (const scene of Object.values(scenes)) {
+      scene.init();
     }
 
     socket.on('playerCount', (n: any) => {
@@ -72,7 +70,7 @@ export class Application {
   }
 
   //!!!
-  start(sceneName: any, ...args: any) {
+  start(sceneName: string, ...args: any) {
     //если запускаем туже сцену
     if (this.activeScene && this.activeScene.name === sceneName) {
       return false;
