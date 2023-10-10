@@ -1,7 +1,7 @@
 import { Ship } from './Ship';
 import { Shot } from './Shot';
 import { matrixItem } from './types';
-import { getRandomBetween, getRandomFrom, isUnderPoint } from './utils';
+import { getRandomBetween, getRandomFrom } from './utils';
 
 export class Battlefield {
   ships: Ship[] = [];
@@ -68,6 +68,7 @@ export class Battlefield {
 
       cell.append(marker);
     }
+    console.log(setInterval(() => console.log(this.ships.slice()), 5000));
   }
 
   get loser() {

@@ -1,5 +1,3 @@
-import { isUnderPoint } from "./utils";
-
 export class Ship {
   startX: number;
   startY: number;
