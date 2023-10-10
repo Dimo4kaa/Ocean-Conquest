@@ -1,14 +1,11 @@
 import { Ship } from './Ship';
 import { Shot } from './Shot';
+import { matrixItem } from './types';
 import { getRandomBetween, getRandomFrom, isUnderPoint } from './utils';
 
 export class Battlefield {
   ships: Ship[] = [];
   shots: Shot[] = [];
-  //TYPES
-  _private_matrix: any = null;
-  _private_changed: any = true;
-
   root: HTMLDivElement;
   table: HTMLTableElement;
   dock: HTMLDivElement;
@@ -84,24 +81,20 @@ export class Battlefield {
   }
 
   get matrix() {
-    if (!this._private_changed) {
-      this._private_matrix;
-    }
-
-    const matrix = [];
+    console.log('MATRIX!')
+    const matrix: matrixItem[][] = [];
 
     for (let y = 0; y < 10; y++) {
       const row = [];
 
       for (let x = 0; x < 10; x++) {
         //!!!
-        const item: any = {
+        const item: matrixItem = {
           x,
           y,
           ship: null,
           free: true,
-
-          shoted: false,
+          shotted: false,
           wounded: false,
         };
 
@@ -122,16 +115,16 @@ export class Battlefield {
 
       for (let i = 0; i < ship.size; i++) {
         //!!!
-        const cx = x + dx * i;
-        const cy = y + dy * i;
+        const cx = x! + dx * i;
+        const cy = y! + dy * i;
 
         const item = matrix[cy][cx];
         item.ship = ship;
       }
 
       //!!! Ship x и Ship y
-      for (let y = ship.y - 1; y < ship.y + ship.size * dy + dx + 1; y++) {
-        for (let x = ship.x - 1; x < ship.x + ship.size * dx + dy + 1; x++) {
+      for (let y = ship.y! - 1; y < ship.y! + ship.size * dy + dx + 1; y++) {
+        for (let x = ship.x! - 1; x < ship.x! + ship.size * dx + dy + 1; x++) {
           if (this.inField(x, y)) {
             const item = matrix[y][x];
             item.free = false;
@@ -142,17 +135,17 @@ export class Battlefield {
 
     for (const { x, y } of this.shots) {
       const item = matrix[y][x];
-      item.shoted = true;
+      item.shotted = true;
 
       if (item.ship) {
         item.wounded = true;
       }
     }
 
-    this._private_matrix = matrix;
-    this._private_changed = false;
+    // this._private_matrix = matrix;
+    // this._private_changed = false;
 
-    return this._private_matrix;
+    return matrix;
   }
 
   get complete() {
@@ -169,7 +162,7 @@ export class Battlefield {
     return true;
   }
 
-  addShip(ship: Ship, x: number, y: number) {
+  addShip(ship: Ship, x?: number, y?: number) {
     this.ships.push(ship);
 
     if (this.inField(x, y)) {
@@ -180,8 +173,8 @@ export class Battlefield {
 
       for (let i = 0; i < ship.size; i++) {
         //!!!
-        const cx = x + dx * i;
-        const cy = y + dy * i;
+        const cx = x! + dx * i;
+        const cy = y! + dy * i;
 
         if (!this.inField(cx, cy)) {
           placed = false;
@@ -200,13 +193,11 @@ export class Battlefield {
       }
     }
 
-    this._private_changed = true;
-
     if (this.showShips) {
       this.dock.append(ship.div);
 
       if (ship.placed) {
-        const cell = this.cells[y][x];
+        const cell = this.cells[y!][x!];
         const cellRect = cell.getBoundingClientRect();
         const rootRect = this.root.getBoundingClientRect();
 
@@ -230,8 +221,6 @@ export class Battlefield {
 
     ship.x = null;
     ship.y = null;
-
-    this._private_changed = true;
 
     const index = this.ships.indexOf(ship);
     this.ships.splice(index, 1);
@@ -260,7 +249,6 @@ export class Battlefield {
     }
 
     this.shots.push(shot);
-    this._private_changed = true;
 
     const matrix = this.matrix;
     const { x, y } = shot;
@@ -269,14 +257,14 @@ export class Battlefield {
       shot.setVariant('wounded');
 
       const { ship } = matrix[y][x];
-      const dx = ship.direction === 'row';
-      const dy = ship.direction === 'column';
+      const dx = ship!.direction === 'row';
+      const dy = ship!.direction === 'column';
 
       let killed = true;
 
-      for (let i = 0; i < ship.size; i++) {
-        const cx = ship.x + Number(dx) * i;
-        const cy = ship.y + Number(dy) * i;
+      for (let i = 0; i < ship!.size; i++) {
+        const cx = ship!.x! + Number(dx) * i;
+        const cy = ship!.y! + Number(dy) * i;
         const item = matrix[cy][cx];
 
         if (!item.wounded) {
@@ -286,11 +274,11 @@ export class Battlefield {
       }
 
       if (killed) {
-        ship.killed = true;
+        ship!.killed = true;
 
-        for (let i = 0; i < ship.size; i++) {
-          const cx = ship.x + Number(dx) * i;
-          const cy = ship.y + Number(dy) * i;
+        for (let i = 0; i < ship!.size; i++) {
+          const cx = ship!.x! + Number(dx) * i;
+          const cy = ship!.y! + Number(dy) * i;
 
           const shot = this.shots.find((shot) => shot.x === cx && shot.y === cy);
           shot!.setVariant('killed');
@@ -318,8 +306,6 @@ export class Battlefield {
 
     const index = this.shots.indexOf(shot);
     this.shots.splice(index, 1);
-
-    this._private_changed = true;
 
     if (Array.prototype.includes.call(this.polygon.children, shot.div)) {
       shot.div.remove();

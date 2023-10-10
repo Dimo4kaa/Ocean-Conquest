@@ -1,6 +1,7 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Ship } from '../Ship';
+import { matrixItem } from '../types';
 import { addListener, getRandomSeveral, isUnderPoint } from '../utils';
 
 const shipDatas = [
@@ -187,7 +188,7 @@ export class PreparationScene extends Scene {
   startComputer(level: any) {
     const matrix = this.app.player.matrix;
     const withoutShipItems = matrix.flat().filter((item: any) => !item.ship);
-    let untouchables = [];
+    let untouchables: matrixItem[] = [];
 
     if (level === 'simple') {
     } else if (level === 'middle') {
@@ -195,7 +196,6 @@ export class PreparationScene extends Scene {
     } else if (level === 'hard') {
       untouchables = getRandomSeveral(withoutShipItems, 40);
     }
-
     this.app.start('computer', untouchables);
   }
 }

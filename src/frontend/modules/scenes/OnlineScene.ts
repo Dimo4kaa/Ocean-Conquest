@@ -62,7 +62,7 @@ export class OnlineScene extends Scene {
     });
 
     socket.on('challengeOpponent', (key) => {
-      history.pushState(null, null, `/${key}`);
+      history.pushState(null, '', `/${key}`);
       alert(`Первый кто пройдет по этой ссылки будет играть с вами:\n${location.href}`);
     });
 
@@ -108,7 +108,7 @@ export class OnlineScene extends Scene {
 
     const input = chat.querySelector('input')!;
     this.removeEventListeners.push(
-      addListener(input, 'keydown', (e) => {
+      addListener(input, 'keydown', (e: KeyboardEvent) => {
         if (e.key === 'Enter' && input.value) {
           const message = input.value.slice(0, 120);
           input.value = '';

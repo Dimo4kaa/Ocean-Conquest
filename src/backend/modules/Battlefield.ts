@@ -35,7 +35,7 @@ export class Battlefield {
           ship: null,
           free: true,
 
-          shoted: false,
+          shotted: false,
           wounded: false,
         };
 
@@ -74,7 +74,7 @@ export class Battlefield {
 
     for (const { x, y } of this.shots) {
       const item = matrix[y][x];
-      item.shoted = true;
+      item.shotted = true;
 
       if (item.ship) {
         item.wounded = true;
