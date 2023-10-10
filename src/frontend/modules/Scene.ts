@@ -9,11 +9,9 @@ export class Scene {
     this.app = app;
   }
 
-  init() {}
+  start(...args: any[]) {}
 
-  start() {}
+  update(...args: any[]) {}
 
-  update() {}
-
-  stop() {}
+  stop(...args: any[]) {}
 }

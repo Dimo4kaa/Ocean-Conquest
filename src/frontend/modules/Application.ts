@@ -14,11 +14,7 @@ export class Application {
   player: Battlefield;
   opponent: Battlefield;
 
-  scenes = {
-    preparation: new PreparationScene('preparation', this),
-    computer: new ComputerScene('computer', this),
-    online: new OnlineScene('online', this),
-  };
+  scenes
   activeScene: any = null;
 
   constructor() {
@@ -31,10 +27,6 @@ export class Application {
 
     document.querySelector('[data-side="player"]')!.append(player.root);
     document.querySelector('[data-side="opponent"]')!.append(opponent.root);
-
-    for (const scene of Object.values(scenes)) {
-      scene.init();
-    }
 
     socket.on('playerCount', (n: any) => {
       document.querySelector('[data-playersCount]')!.textContent = n;
@@ -55,6 +47,12 @@ export class Application {
 
       this.start('online');
     });
+
+    this.scenes = {
+      preparation: new PreparationScene('preparation', this),
+      computer: new ComputerScene('computer', this),
+      online: new OnlineScene('online', this),
+    };
 
     requestAnimationFrame(() => this.tick());
   }

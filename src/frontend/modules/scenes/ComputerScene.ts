@@ -1,3 +1,4 @@
+import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Ship } from '../Ship';
 import { Shot } from '../Shot';
@@ -6,13 +7,14 @@ import { addListener, getRandomBetween, isUnderPoint } from '../utils';
 export class ComputerScene extends Scene {
   untouchables: any[] = [];
   playerTurn = true;
-  status!: HTMLDivElement;
+  status: HTMLDivElement;
   removeEventListeners: any[] = [];
 
-  init() {
+  constructor(name: string, app: Application) {
+    super(name, app);
     this.status = document.querySelector('.battlefield-status')!;
   }
-  //!!!
+
   start(untouchables: any) {
     const { opponent } = this.app;
 

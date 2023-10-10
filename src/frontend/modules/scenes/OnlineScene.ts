@@ -1,3 +1,4 @@
+import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
 import { addListener, isUnderPoint } from '../utils';
@@ -9,7 +10,8 @@ export class OnlineScene extends Scene {
 
   removeEventListeners: any[] = [];
 
-  init() {
+  constructor(name: string, app: Application) {
+    super(name, app)
     this.actionsBar = document.querySelector('[data-scene="online"]')!;
 
     const { socket, player, opponent } = this.app;
@@ -67,7 +69,7 @@ export class OnlineScene extends Scene {
     this.statusUpdate();
   }
 
-  start(variant, key = '') {
+  start(variant: string, key = '') {
     const { socket, player } = this.app;
 
     socket.emit(

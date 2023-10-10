@@ -1,3 +1,4 @@
+import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Ship } from '../Ship';
 import { addListener, getRandomSeveral, isUnderPoint } from '../utils';
@@ -22,7 +23,8 @@ export class PreparationScene extends Scene {
   //!!!???
   removeEventListeners: any[] = [];
 
-  init() {
+  constructor(name: string, app: Application) {
+    super(name, app)
     this.manually();
   }
 
