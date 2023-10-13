@@ -1,21 +1,20 @@
 import { io, Socket } from 'socket.io-client';
 import { Battlefield } from './Battlefield';
 import { Mouse } from './Mouse';
-import { Ship } from './Ship';
 import { PreparationScene } from './scenes/PreparationScene';
 import { ComputerScene } from './scenes/ComputerScene';
 import { OnlineScene } from './scenes/OnlineScene';
+import { matrixItem, SceneNames } from './shared';
 
 export class Application {
-  //!!!
   socket: Socket;
   mouse: Mouse;
 
   player: Battlefield;
   opponent: Battlefield;
 
-  scenes
-  activeScene: any = null;
+  scenes;
+  activeScene: PreparationScene | ComputerScene | OnlineScene | null = null;
 
   constructor() {
     this.mouse = new Mouse(document.body);
@@ -23,7 +22,7 @@ export class Application {
     this.opponent = new Battlefield(false);
     this.socket = io();
 
-    const { scenes, opponent, player, socket } = this;
+    const { opponent, player, socket } = this;
 
     document.querySelector('[data-side="player"]')!.append(player.root);
     document.querySelector('[data-side="opponent"]')!.append(opponent.root);
@@ -37,17 +36,6 @@ export class Application {
       document.body.classList.add('hidden');
     });
 
-    socket.on('reconnection', (ships: any) => {
-      player.clear();
-
-      for (const { size, direction, x, y } of ships) {
-        const ship = new Ship(size, direction);
-        player.addShip(ship, x, y);
-      }
-
-      this.start('online');
-    });
-
     this.scenes = {
       preparation: new PreparationScene('preparation', this),
       computer: new ComputerScene('computer', this),
@@ -55,6 +43,8 @@ export class Application {
     };
 
     requestAnimationFrame(() => this.tick());
+
+    this.start(SceneNames.Preparation);
   }
 
   tick() {
@@ -67,24 +57,34 @@ export class Application {
     this.mouse.tick();
   }
 
-  //!!!
-  start(sceneName: string, ...args: any) {
-    //если запускаем туже сцену
+  start(sceneName: SceneNames): boolean;
+  start(sceneName: SceneNames, untouchables: matrixItem[]): boolean;
+  start(sceneName: SceneNames, variant: string, key?: string): boolean;
+  start(sceneName: SceneNames, arg2?: matrixItem[] | string, key?: string): boolean {
     if (this.activeScene && this.activeScene.name === sceneName) {
       return false;
     }
-    //если такой сцены нет
     if (!this.scenes.hasOwnProperty(sceneName)) {
       return false;
     }
-    //если есть какая-тто активная сцена, то остановливаем её
     if (this.activeScene) {
       this.activeScene.stop();
     }
 
     const scene = this.scenes[sceneName];
     this.activeScene = scene;
-    scene.start(...args);
+
+    switch (sceneName) {
+      case SceneNames.Preparation:
+        (scene as PreparationScene).start();
+        break;
+      case SceneNames.Computer:
+        (scene as ComputerScene).start(arg2 as matrixItem[]);
+        break;
+      case SceneNames.Online:
+        (scene as OnlineScene).start(arg2 as string, key);
+        break;
+    }
 
     return true;
   }

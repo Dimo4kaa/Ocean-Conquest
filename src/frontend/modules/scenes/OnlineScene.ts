@@ -1,6 +1,7 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
+import { SceneNames } from '../shared';
 import { addListener, isUnderPoint } from '../utils';
 
 export class OnlineScene extends Scene {
@@ -8,25 +9,25 @@ export class OnlineScene extends Scene {
   status = '';
   ownTurn = false;
 
-  removeEventListeners: any[] = [];
+  removeEventListeners: (() => void)[] = [];
 
   constructor(name: string, app: Application) {
-    super(name, app)
+    super(name, app);
     this.actionsBar = document.querySelector('[data-scene="online"]')!;
 
     const { socket, player, opponent } = this.app;
 
-    socket.on('statusChange', (status: any) => {
+    socket.on('statusChange', (status: string) => {
       this.status = status;
       this.statusUpdate();
     });
 
-    socket.on('turnUpdate', (ownTurn: any) => {
+    socket.on('turnUpdate', (ownTurn: boolean) => {
       this.ownTurn = ownTurn;
       this.statusUpdate();
     });
 
-    socket.on('message', (message: any) => {
+    socket.on('message', (message: string) => {
       const div = document.createElement('div');
       div.classList.add('app-message');
       div.textContent = message;
@@ -106,27 +107,16 @@ export class OnlineScene extends Scene {
 
     this.removeEventListeners = [];
 
-    const input = chat.querySelector('input')!;
-    this.removeEventListeners.push(
-      addListener(input, 'keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' && input.value) {
-          const message = input.value.slice(0, 120);
-          input.value = '';
-          socket.emit('message', message);
-        }
-      }),
-    );
-
     this.removeEventListeners.push(
       addListener(againButton, 'click', () => {
-        this.app.start('preparation');
+        this.app.start(SceneNames.Preparation);
       }),
     );
 
     this.removeEventListeners.push(
       addListener(gaveupButton, 'click', () => {
         socket.emit('gaveup');
-        this.app.start('preparation');
+        this.app.start(SceneNames.Preparation);
       }),
     );
 
@@ -146,19 +136,25 @@ export class OnlineScene extends Scene {
 
   statusUpdate() {
     const statusDiv = this.actionsBar.querySelector('.battlefield-status')!;
-
-    if (!this.status) {
-      statusDiv.textContent = '';
-    } else if (this.status === 'randomFinding') {
-      statusDiv.textContent = 'Поиск случайного соперника';
-    } else if (this.status === 'play') {
-      statusDiv.textContent = this.ownTurn ? 'Ваш ход' : 'Ход соперника';
-    } else if (this.status === 'winner') {
-      statusDiv.textContent = 'Вы победили';
-    } else if (this.status === 'loser') {
-      statusDiv.textContent = 'Вы проиграли';
-    } else if (this.status === 'waiting') {
-      statusDiv.textContent = 'Ожидаем соперника';
+    switch (this.status) {
+      case '':
+        statusDiv.textContent = '';
+        break;
+      case 'randomFinding':
+        statusDiv.textContent = 'Поиск случайного соперника';
+        break;
+      case 'play':
+        statusDiv.textContent = this.ownTurn ? 'Ваш ход' : 'Ход соперника';
+        break;
+      case 'winner':
+        statusDiv.textContent = 'Вы победили';
+        break;
+      case 'loser':
+        statusDiv.textContent = 'Вы проиграли';
+        break;
+      case 'waiting':
+        statusDiv.textContent = 'Ожидаем соперника';
+        break;
     }
   }
 
@@ -189,8 +185,8 @@ export class OnlineScene extends Scene {
         cell.classList.add('battlefield-item__active');
 
         if (mouse.left && !mouse.pLeft) {
-          const x = parseInt(cell.dataset.x!);
-          const y = parseInt(cell.dataset.y!);
+          const x = Number(cell.dataset.x!);
+          const y = Number(cell.dataset.y!);
 
           socket.emit('addShot', x, y);
         }

@@ -1,6 +1,6 @@
 import { Ship } from './Ship';
 import { Shot } from './Shot';
-import { matrixItem } from './types';
+import { matrixItem } from './shared';
 import { getRandomBetween, getRandomFrom } from './utils';
 
 export class Battlefield {
@@ -68,7 +68,6 @@ export class Battlefield {
 
       cell.append(marker);
     }
-    console.log(setInterval(() => console.log(this.ships.slice()), 5000));
   }
 
   get loser() {
@@ -88,7 +87,6 @@ export class Battlefield {
       const row = [];
 
       for (let x = 0; x < 10; x++) {
-        //!!!
         const item: matrixItem = {
           x,
           y,
@@ -114,17 +112,17 @@ export class Battlefield {
       const dy = ship.direction === 'column';
 
       for (let i = 0; i < ship.size; i++) {
-        //!!!
-        const cx = x! + dx * i;
-        const cy = y! + dy * i;
+        const cx = x! + Number(dx) * i;
+        const cy = y! + Number(dy) * i;
 
         const item = matrix[cy][cx];
         item.ship = ship;
       }
 
-      //!!! Ship x и Ship y
-      for (let y = ship.y! - 1; y < ship.y! + ship.size * dy + dx + 1; y++) {
-        for (let x = ship.x! - 1; x < ship.x! + ship.size * dx + dy + 1; x++) {
+      // inner loop counts rows
+      // the outer loop counts the columns
+      for (let y = ship.y! - 1; y < ship.y! + ship.size * Number(dy) + Number(dx) + 1; y++) {
+        for (let x = ship.x! - 1; x < ship.x! + ship.size * Number(dx) + Number(dy) + 1; x++) {
           if (this.inField(x, y)) {
             const item = matrix[y][x];
             item.free = false;
@@ -141,10 +139,6 @@ export class Battlefield {
         item.wounded = true;
       }
     }
-
-    // this._private_matrix = matrix;
-    // this._private_changed = false;
-
     return matrix;
   }
 
@@ -166,31 +160,32 @@ export class Battlefield {
     this.ships.push(ship);
     const matrix = this.matrix;
 
-    if (this.inField(x, y)) {
-      const dx = ship.direction === 'row';
-      const dy = ship.direction === 'column';
+    if (x && y) {
+      if (this.inField(x, y)) {
+        const dx = ship.direction === 'row';
+        const dy = ship.direction === 'column';
 
-      let placed = true;
+        let placed = true;
 
-      for (let i = 0; i < ship.size; i++) {
-        //!!!
-        const cx = x! + dx * i;
-        const cy = y! + dy * i;
+        for (let i = 0; i < ship.size; i++) {
+          const cx = x! + Number(dx) * i;
+          const cy = y! + Number(dy) * i;
 
-        if (!this.inField(cx, cy)) {
-          placed = false;
-          break;
+          if (!this.inField(cx, cy)) {
+            placed = false;
+            break;
+          }
+
+          const item = matrix[cy][cx];
+          if (!item.free) {
+            placed = false;
+            break;
+          }
         }
 
-        const item = matrix[cy][cx];
-        if (!item.free) {
-          placed = false;
-          break;
+        if (placed) {
+          Object.assign(ship, { x, y });
         }
-      }
-
-      if (placed) {
-        Object.assign(ship, { x, y });
       }
     }
 
@@ -226,6 +221,7 @@ export class Battlefield {
     const index = this.ships.indexOf(ship);
     this.ships.splice(index, 1);
 
+    //???
     if (Array.prototype.includes.call(this.dock.children, ship.div)) {
       ship.div.remove();
     }
@@ -234,6 +230,7 @@ export class Battlefield {
   }
 
   removeAllShips() {
+    //???
     const ships = this.ships.slice();
     for (const ship of ships) {
       this.removeShip(ship);
@@ -308,6 +305,7 @@ export class Battlefield {
     const index = this.shots.indexOf(shot);
     this.shots.splice(index, 1);
 
+    //???
     if (Array.prototype.includes.call(this.polygon.children, shot.div)) {
       shot.div.remove();
     }
@@ -316,6 +314,7 @@ export class Battlefield {
   }
 
   removeAllShots() {
+    //???
     const shots = this.shots.slice();
 
     for (const shot of shots) {
@@ -325,22 +324,19 @@ export class Battlefield {
     return shots.length;
   }
 
-  //!!!???
   randomize() {
     this.removeAllShips();
 
     for (let size = 4; size >= 1; size--) {
       for (let n = 0; n < 5 - size; n++) {
         const direction = getRandomFrom('row', 'column');
-        //!!!
-        const ship: any = new Ship(size, direction);
-
+        const ship = new Ship(size, direction);
         while (!ship.placed) {
           const x = getRandomBetween(0, 9);
           const y = getRandomBetween(0, 9);
-
           this.removeShip(ship);
           this.addShip(ship, x, y);
+          console.log(ship);
         }
       }
     }
@@ -351,13 +347,7 @@ export class Battlefield {
     this.removeAllShips();
   }
 
-  inField(x: any, y: any) {
-    const isNumber = (n: any) => parseInt(n) === n && !isNaN(n) && ![Infinity, -Infinity].includes(n);
-
-    if (!isNumber(x) || !isNumber(y)) {
-      return false;
-    }
-
+  inField(x: number, y: number) {
     return 0 <= x && x < 10 && 0 <= y && y < 10;
   }
 }

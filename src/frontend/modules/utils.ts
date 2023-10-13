@@ -13,10 +13,15 @@ export function isUnderPoint<T extends { x: number; y: number }>(point: T, eleme
 
   return left <= x && x <= left + width && top <= y && y <= top + height;
 }
-//!!!
-export function addListener(element: any, ...args: any) {
-  element.addEventListener(...args);
-  return () => element.removeEventListener(...args);
+
+export function addListener(
+  element: Element,
+  eventType: string,
+  listener: EventListenerOrEventListenerObject,
+  options?: boolean | AddEventListenerOptions,
+) {
+  element.addEventListener(eventType, listener, options);
+  return () => element.removeEventListener(eventType, listener, options);
 }
 
 export function getRandomSeveral<T>(array: T[] = [], size = 1): T[] {

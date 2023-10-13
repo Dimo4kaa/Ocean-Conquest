@@ -1,31 +1,18 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Ship } from '../Ship';
-import { matrixItem } from '../types';
+import { GameDiff, SceneNames, matrixItem, shipDatas } from '../shared';
 import { addListener, getRandomSeveral, isUnderPoint } from '../utils';
-
-const shipDatas = [
-  { size: 4, direction: 'row', startX: 10, startY: 345 },
-  { size: 3, direction: 'row', startX: 10, startY: 390 },
-  { size: 3, direction: 'row', startX: 120, startY: 390 },
-  { size: 2, direction: 'row', startX: 10, startY: 435 },
-  { size: 2, direction: 'row', startX: 88, startY: 435 },
-  { size: 2, direction: 'row', startX: 167, startY: 435 },
-  { size: 1, direction: 'row', startX: 10, startY: 480 },
-  { size: 1, direction: 'row', startX: 55, startY: 480 },
-  { size: 1, direction: 'row', startX: 100, startY: 480 },
-  { size: 1, direction: 'row', startX: 145, startY: 480 },
-];
 
 export class PreparationScene extends Scene {
   draggedShip: Ship | null = null;
   draggedOffsetX = 0;
   draggedOffsetY = 0;
-  //!!!???
-  removeEventListeners: any[] = [];
+
+  removeEventListeners: (() => void)[] = [];
 
   constructor(name: string, app: Application) {
-    super(name, app)
+    super(name, app);
     this.manually();
   }
 
@@ -42,33 +29,37 @@ export class PreparationScene extends Scene {
 
     document.querySelector('[data-scene="preparation"]')!.classList.remove('hidden');
 
-    const manuallyButton = document.querySelector('[data-action="manually"]');
-    const randomizeButton = document.querySelector('[data-action="randomize"]');
-    const simpleButton = document.querySelector('[data-computer="simple"]');
-    const middleButton = document.querySelector('[data-computer="middle"]');
-    const hardButton = document.querySelector('[data-computer="hard"]');
-    const randomButton = document.querySelector('[data-type="random"]');
-    const challengeButton = document.querySelector('[data-type="challenge"]');
-    const takeChallengeButton = document.querySelector('[data-type="takeChallenge"]');
+    const manuallyButton = document.querySelector('[data-action="manually"]')!;
+    const randomizeButton = document.querySelector('[data-action="randomize"]')!;
+    const simpleButton = document.querySelector('[data-computer="simple"]')!;
+    const middleButton = document.querySelector('[data-computer="middle"]')!;
+    const hardButton = document.querySelector('[data-computer="hard"]')!;
+    const randomButton = document.querySelector('[data-type="random"]')!;
+    const challengeButton = document.querySelector('[data-type="challenge"]')!;
+    const takeChallengeButton = document.querySelector('[data-type="takeChallenge"]')!;
 
     this.removeEventListeners.push(addListener(manuallyButton, 'click', () => this.manually()));
 
     this.removeEventListeners.push(addListener(randomizeButton, 'click', () => this.randomize()));
 
-    this.removeEventListeners.push(addListener(simpleButton, 'click', () => this.startComputer('simple')));
+    this.removeEventListeners.push(addListener(simpleButton, 'click', () => this.startComputer(GameDiff.Simple)));
 
-    this.removeEventListeners.push(addListener(middleButton, 'click', () => this.startComputer('middle')));
+    this.removeEventListeners.push(addListener(middleButton, 'click', () => this.startComputer(GameDiff.Middle)));
 
-    this.removeEventListeners.push(addListener(hardButton, 'click', () => this.startComputer('hard')));
+    this.removeEventListeners.push(addListener(hardButton, 'click', () => this.startComputer(GameDiff.Hard)));
 
-    this.removeEventListeners.push(addListener(randomButton, 'click', () => this.app.start('online', 'random')));
+    this.removeEventListeners.push(
+      addListener(randomButton, 'click', () => this.app.start(SceneNames.Online, 'random')),
+    );
 
-    this.removeEventListeners.push(addListener(challengeButton, 'click', () => this.app.start('online', 'challenge')));
+    this.removeEventListeners.push(
+      addListener(challengeButton, 'click', () => this.app.start(SceneNames.Online, 'challenge')),
+    );
 
     this.removeEventListeners.push(
       addListener(takeChallengeButton, 'click', () => {
-        const key = prompt('Ключ партии:');
-        this.app.start('online', 'challenge', key);
+        const key = String(prompt('Ключ партии:'));
+        this.app.start(SceneNames.Online, 'challenge', key);
       }),
     );
   }
@@ -84,7 +75,6 @@ export class PreparationScene extends Scene {
   update() {
     const { mouse, player } = this.app;
 
-    // Потенциально хотим начать тянуть корабль
     if (!this.draggedShip && mouse.left && !mouse.pLeft) {
       const ship = player.ships.find((ship) => isUnderPoint(mouse, ship.div));
 
@@ -100,7 +90,6 @@ export class PreparationScene extends Scene {
       }
     }
 
-    // Перетаскивание
     if (mouse.left && this.draggedShip) {
       const { left, top } = player.root.getBoundingClientRect();
       const x = mouse.x - left - this.draggedOffsetX;
@@ -110,7 +99,6 @@ export class PreparationScene extends Scene {
       this.draggedShip.div.style.top = `${y}px`;
     }
 
-    // Бросание
     if (!mouse.left && this.draggedShip) {
       const ship = this.draggedShip;
       this.draggedShip = null;
@@ -126,19 +114,17 @@ export class PreparationScene extends Scene {
       const cell = player.cells.flat().find((cell) => isUnderPoint(point, cell));
 
       if (cell) {
-        const x = parseInt(cell.dataset.x!);
-        const y = parseInt(cell.dataset.y!);
+        const x = Number(cell.dataset.x!);
+        const y = Number(cell.dataset.y!);
 
         player.removeShip(ship);
         player.addShip(ship, x, y);
       } else {
         player.removeShip(ship);
-        //!!!???
         player.addShip(ship);
       }
     }
 
-    // Врощаение
     if (this.draggedShip && mouse.delta) {
       this.draggedShip.toggleDirection();
     }
@@ -162,7 +148,6 @@ export class PreparationScene extends Scene {
 
   randomize() {
     const { player } = this.app;
-    //!!!???
     player.randomize();
 
     for (let i = 0; i < 10; i++) {
@@ -180,14 +165,13 @@ export class PreparationScene extends Scene {
 
     for (const { size, direction, startX, startY } of shipDatas) {
       const ship = new Ship(size, direction, startX, startY);
-      //!!!???
       player.addShip(ship);
     }
   }
 
-  startComputer(level: any) {
+  startComputer(level: GameDiff) {
     const matrix = this.app.player.matrix;
-    const withoutShipItems = matrix.flat().filter((item: any) => !item.ship);
+    const withoutShipItems = matrix.flat().filter((item) => !item.ship);
     let untouchables: matrixItem[] = [];
 
     if (level === 'simple') {
@@ -196,6 +180,6 @@ export class PreparationScene extends Scene {
     } else if (level === 'hard') {
       untouchables = getRandomSeveral(withoutShipItems, 40);
     }
-    this.app.start('computer', untouchables);
+    this.app.start(SceneNames.Computer, untouchables);
   }
 }

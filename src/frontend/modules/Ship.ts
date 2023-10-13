@@ -1,6 +1,6 @@
 export class Ship {
-  startX: number;
-  startY: number;
+  startX: number | null;
+  startY: number | null;
 
   size: number;
   direction!: string;
@@ -10,7 +10,7 @@ export class Ship {
   x: number | null;
   y: number | null;
 
-  constructor(size: number, direction: string, startX: number, startY: number) {
+  constructor(size: number, direction: string, startX: number | null = null, startY: number | null = null) {
     this.startX = startX;
     this.startY = startY;
     this.size = size;

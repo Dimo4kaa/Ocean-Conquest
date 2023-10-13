@@ -1,28 +1,27 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
-import { Ship } from '../Ship';
 import { Shot } from '../Shot';
+import { SceneNames, matrixItem } from '../shared';
 import { addListener, getRandomBetween, isUnderPoint } from '../utils';
 
 export class ComputerScene extends Scene {
-  untouchables: any[] = [];
+  untouchables: matrixItem[] = [];
   playerTurn = true;
   status: HTMLDivElement;
-  removeEventListeners: any[] = [];
+  removeEventListeners: (() => void)[] = [];
 
   constructor(name: string, app: Application) {
     super(name, app);
     this.status = document.querySelector('.battlefield-status')!;
   }
 
-  start(untouchables: any) {
+  start(untouchables: matrixItem[]) {
     const { opponent } = this.app;
 
     document.querySelectorAll('.app-actions').forEach((element) => element.classList.add('hidden'));
     document.querySelector('[data-scene="computer"]')!.classList.remove('hidden');
 
     opponent.clear();
-    //!!!
     opponent.randomize();
 
     this.untouchables = untouchables;
@@ -34,17 +33,16 @@ export class ComputerScene extends Scene {
 
     gaveupButton.classList.remove('hidden');
     againButton.classList.add('hidden');
-    //!!!
-    // addListener!!!!!!!!!!!!!!!!!!!!!!!
+
     this.removeEventListeners.push(
       addListener(gaveupButton, 'click', () => {
-        this.app.start('preparation');
+        this.app.start(SceneNames.Preparation);
       }),
     );
 
     this.removeEventListeners.push(
       addListener(againButton, 'click', () => {
-        this.app.start('preparation');
+        this.app.start(SceneNames.Preparation);
       }),
     );
   }
@@ -85,8 +83,8 @@ export class ComputerScene extends Scene {
         cell.classList.add('battlefield-item__active');
 
         if (this.playerTurn && mouse.left && !mouse.pLeft) {
-          const x = parseInt(cell.dataset.x!);
-          const y = parseInt(cell.dataset.y!);
+          const x = Number(cell.dataset.x!);
+          const y = Number(cell.dataset.y!);
 
           const shot = new Shot(x, y);
           const result = opponent.addShot(shot);
