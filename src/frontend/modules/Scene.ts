@@ -1,6 +1,6 @@
 import { Application } from './Application';
 
-export class Scene {
+export abstract class Scene {
   name: string;
   app: Application;
 
@@ -9,9 +9,9 @@ export class Scene {
     this.app = app;
   }
 
-  start(...args: any[]) {}
+  abstract start(...args: any[]): void
 
-  update(...args: any[]) {}
+  abstract update(...args: any[]): void
 
-  stop(...args: any[]) {}
+  abstract stop(...args: any[]): void
 }

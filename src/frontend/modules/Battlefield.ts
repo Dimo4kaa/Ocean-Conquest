@@ -1,6 +1,6 @@
 import { Ship } from './Ship';
 import { Shot } from './Shot';
-import { matrixItem } from './shared';
+import { matrixItem } from './types';
 import { getRandomBetween, getRandomFrom } from './utils';
 
 export class Battlefield {
@@ -160,32 +160,30 @@ export class Battlefield {
     this.ships.push(ship);
     const matrix = this.matrix;
 
-    if (x && y) {
-      if (this.inField(x, y)) {
-        const dx = ship.direction === 'row';
-        const dy = ship.direction === 'column';
+    if (x !== undefined && y !== undefined && this.inField(x, y)) {
+      const dx = ship.direction === 'row';
+      const dy = ship.direction === 'column';
 
-        let placed = true;
+      let placed = true;
 
-        for (let i = 0; i < ship.size; i++) {
-          const cx = x! + Number(dx) * i;
-          const cy = y! + Number(dy) * i;
+      for (let i = 0; i < ship.size; i++) {
+        const cx = x! + Number(dx) * i;
+        const cy = y! + Number(dy) * i;
 
-          if (!this.inField(cx, cy)) {
-            placed = false;
-            break;
-          }
-
-          const item = matrix[cy][cx];
-          if (!item.free) {
-            placed = false;
-            break;
-          }
+        if (!this.inField(cx, cy)) {
+          placed = false;
+          break;
         }
 
-        if (placed) {
-          Object.assign(ship, { x, y });
+        const item = matrix[cy][cx];
+        if (!item.free) {
+          placed = false;
+          break;
         }
+      }
+
+      if (placed) {
+        Object.assign(ship, { x, y });
       }
     }
 
@@ -210,18 +208,13 @@ export class Battlefield {
   }
 
   removeShip(ship: Ship) {
-    //???
     if (!this.ships.includes(ship)) {
       return false;
     }
 
-    ship.x = null;
-    ship.y = null;
-
     const index = this.ships.indexOf(ship);
     this.ships.splice(index, 1);
 
-    //???
     if (Array.prototype.includes.call(this.dock.children, ship.div)) {
       ship.div.remove();
     }
@@ -230,7 +223,6 @@ export class Battlefield {
   }
 
   removeAllShips() {
-    //???
     const ships = this.ships.slice();
     for (const ship of ships) {
       this.removeShip(ship);
@@ -254,15 +246,15 @@ export class Battlefield {
     if (matrix[y][x].ship) {
       shot.setVariant('wounded');
 
-      const { ship } = matrix[y][x];
-      const dx = ship!.direction === 'row';
-      const dy = ship!.direction === 'column';
+      const ship = matrix[y][x].ship!;
+      const dx = ship.direction === 'row';
+      const dy = ship.direction === 'column';
 
       let killed = true;
 
-      for (let i = 0; i < ship!.size; i++) {
-        const cx = ship!.x! + Number(dx) * i;
-        const cy = ship!.y! + Number(dy) * i;
+      for (let i = 0; i < ship.size; i++) {
+        const cx = ship.x! + Number(dx) * i;
+        const cy = ship.y! + Number(dy) * i;
         const item = matrix[cy][cx];
 
         if (!item.wounded) {
@@ -272,7 +264,7 @@ export class Battlefield {
       }
 
       if (killed) {
-        ship!.killed = true;
+        ship.killed = true;
 
         for (let i = 0; i < ship!.size; i++) {
           const cx = ship!.x! + Number(dx) * i;
@@ -297,7 +289,6 @@ export class Battlefield {
   }
 
   removeShot(shot: Shot) {
-    //???
     if (!this.shots.includes(shot)) {
       return false;
     }
@@ -305,7 +296,6 @@ export class Battlefield {
     const index = this.shots.indexOf(shot);
     this.shots.splice(index, 1);
 
-    //???
     if (Array.prototype.includes.call(this.polygon.children, shot.div)) {
       shot.div.remove();
     }
@@ -314,7 +304,6 @@ export class Battlefield {
   }
 
   removeAllShots() {
-    //???
     const shots = this.shots.slice();
 
     for (const shot of shots) {
@@ -336,7 +325,6 @@ export class Battlefield {
           const y = getRandomBetween(0, 9);
           this.removeShip(ship);
           this.addShip(ship, x, y);
-          console.log(ship);
         }
       }
     }

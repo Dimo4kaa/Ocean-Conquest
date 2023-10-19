@@ -21,11 +21,7 @@ export class Shot {
     }
   }
 
-  setVariant(variant: string, force = false) {
-    if (!force && this.variant === variant) {
-      return false;
-    }
-
+  setVariant(variant: string) {
     this.variant = variant;
 
     this.div.classList.remove('shot-missed', 'shot-wounded', 'shot-killed');

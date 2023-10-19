@@ -1,42 +1,19 @@
-import { Party } from "./Party.js";
-import { Player } from "./Player.js";
-import { Ship } from "./Ship.js";
-import { getRandomString } from "./utils.js";
-
-
-const RECONNECTION_TIMER = 5000;
+import { Socket } from 'socket.io';
+import { Party } from './Party.js';
+import { Player } from './Player.js';
+import { Ship } from './Ship.js';
+import { getRandomString } from './utils.js';
 
 export class PartyManager {
-  players: any = [];
-  parties: any = [];
+  players: Player[] = [];
+  parties: Party[] = [];
 
-  waitingRandom: any[] = [];
-  waitingChallenge = new Map();
+  waitingRandom: Player[] = [];
+  waitingChallenge: Map<string, Player> = new Map();
 
-  reconnections = new Map();
-
-  connection(socket: any) {
-    // TODO: индентифицировать пользователя
-    const sessionId = socket.request.sessionID;
-    let player = this.players.find((player: any) => player.sessionId === sessionId);
-
-    // if (player) {
-    // 	player.socket.emit("doubleConnection");
-    // 	player.socket.disconnect();
-    // 	player.socket = socket;
-
-    // 	if (this.reconnections.has(player)) {
-    // 		clearTimeout(this.reconnections.get(player));
-    // 		this.reconnections.delete(player);
-
-    // 		if (player.party) {
-    // 			player.party.reconnection(player);
-    // 		}
-    // 	}
-    // } else {
-    player = new Player(socket, sessionId);
+  connection(socket: Socket) {
+    let player = new Player(socket);
     this.players.push(player);
-    // }
 
     const isFree = () => {
       if (this.waitingRandom.includes(player)) {
@@ -63,8 +40,8 @@ export class PartyManager {
 
       player.battlefield.clear();
       for (const { size, direction, x, y } of ships) {
-        const ship = new Ship(size, direction);
-        player.battlefield.addShip(ship, x, y);
+        const ship = new Ship(size, direction, x, y);
+        player.battlefield.addShip(ship);
       }
     });
 
@@ -78,13 +55,8 @@ export class PartyManager {
 
       if (this.waitingRandom.length >= 2) {
         const [player1, player2] = this.waitingRandom.splice(0, 2);
-        const party = new Party(player1, player2);
+        const party = new Party(this.parties, player1, player2);
         this.parties.push(party);
-
-        const unsubcribe = party.subscribe(() => {
-          this.removeParty(party);
-          unsubcribe();
-        });
       }
     });
 
@@ -94,10 +66,10 @@ export class PartyManager {
       }
 
       if (this.waitingChallenge.has(key)) {
-        const opponent = this.waitingChallenge.get(key);
+        const opponent = this.waitingChallenge.get(key)!;
         this.waitingChallenge.delete(key);
 
-        const party = new Party(opponent, player);
+        const party = new Party(this.parties, opponent, player);
         this.parties.push(party);
       } else {
         key = getRandomString(20);
@@ -132,33 +104,13 @@ export class PartyManager {
         player.party.addShot(player, x, y);
       }
     });
-
-    socket.on('message', (message: any) => {
-      if (player.party) {
-        player.party.sendMessage(message);
-      }
-    });
   }
 
-  disconnect(socket: any) {
-    const player = this.players.find((player: any) => player.socket === socket);
+  disconnect(socket: Socket) {
+    const player = this.players.find((player) => player.socket === socket);
 
     if (!player) {
       return;
-    }
-
-    if (player.party) {
-      const flag = setTimeout(() => {
-        this.reconnections.delete(player);
-
-        if (player.party) {
-          player.party.gaveup(player);
-        }
-
-        this.removePlayer(player);
-      }, RECONNECTION_TIMER);
-
-      this.reconnections.set(player, flag);
     }
 
     if (this.waitingRandom.includes(player)) {
@@ -173,52 +125,15 @@ export class PartyManager {
       const key = keys[index];
       this.waitingChallenge.delete(key);
     }
-  }
 
-  addPlayer(player: Player) {
-    if (this.players.includes(player)) {
-      return false;
-    }
-
-    this.players.push(player);
-
-    return true;
-  }
-
-  removePlayer(player: Player) {
-    if (!this.players.includes(player)) {
-      return false;
+    if (player.party) {
+      const opponent = player === player.party.player1 ? player.party.player2 : player.party.player1;
+      opponent.emit('statusChange', 'winner');
+      player.party.stop();
     }
 
     const index = this.players.indexOf(player);
     this.players.splice(index, 1);
-
-    if (this.waitingRandom.includes(player)) {
-      const index = this.waitingRandom.indexOf(player);
-      this.waitingRandom.splice(index, 1);
-    }
-
-    return true;
-  }
-
-  removeAllPlayers() {
-    const players = this.players.slice();
-
-    for (const player of players) {
-      this.removePlayer(player);
-    }
-
-    return players.length;
-  }
-
-  addParty(party: Party) {
-    if (this.parties.includes(party)) {
-      return false;
-    }
-
-    this.parties.push(party);
-
-    return true;
   }
 
   removeParty(party: Party) {
@@ -231,30 +146,4 @@ export class PartyManager {
 
     return true;
   }
-
-  removeAllparties() {
-    const parties = this.parties.slice();
-
-    for (const party of parties) {
-      this.removeParty(party);
-    }
-
-    return parties.length;
-  }
-
-  playRandom(player: Player) {
-    if (this.waitingRandom.includes(player)) {
-      return false;
-    }
-
-    this.waitingRandom.push(player);
-
-    if (this.waitingRandom.length >= 2) {
-      const [player1, player2] = this.waitingRandom.splice(0, 2);
-      const party = new Party(player1, player2);
-      this.addParty(party);
-    }
-
-    return true;
-  }
-};
+}

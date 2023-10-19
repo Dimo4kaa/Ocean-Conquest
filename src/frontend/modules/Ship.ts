@@ -16,7 +16,7 @@ export class Ship {
     this.size = size;
     this.div = document.createElement('div');
     this.div.classList.add('ship');
-    this.setDirection(direction, true);
+    this.setDirection(direction);
     this.x = null;
     this.y = null;
   }
@@ -25,11 +25,7 @@ export class Ship {
     return this.x !== null && this.y !== null;
   }
 
-  setDirection(newDirection: string, force = false) {
-    if (!force && this.direction === newDirection) {
-      return false;
-    }
-
+  setDirection(newDirection: string) {
     this.div.classList.remove(`ship-${this.direction}-${this.size}`);
     this.direction = newDirection;
     this.div.classList.add(`ship-${this.direction}-${this.size}`);

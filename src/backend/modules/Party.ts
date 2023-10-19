@@ -1,25 +1,23 @@
-import { Observer } from "./Observer.js";
-import { Player } from "./Player.js";
-import { Shot } from "./Shot.js";
+import { Player } from './Player.js';
+import { Shot } from './Shot.js';
+import { getRandomFrom } from './utils.js';
 
-export class Party extends Observer {
-  player1: Player | null;
-  player2: Player | null;
-
-  turnPlayer: Player | null;
-  play = true;
+export class Party {
+  parties: Party[];
+  player1: Player;
+  player2: Player;
+  turnPlayer: Player;
 
   get nextPlayer() {
     return this.turnPlayer === this.player1 ? this.player2 : this.player1;
   }
 
-  constructor(player1: Player, player2: Player) {
-    super();
+  constructor(parties: Party[], player1: Player, player2: Player) {
+    this.parties = parties;
+    this.player1 = player1;
+    this.player2 = player2;
 
-		this.player1 = player1;
-		this.player2 = player2;
-
-    this.turnPlayer = player1;
+    this.turnPlayer = getRandomFrom(player1, player2);
 
     for (const player of [player1, player2]) {
       player.party = this;
@@ -35,18 +33,13 @@ export class Party extends Observer {
   }
 
   stop() {
-    if (!this.play) {
-      return;
-    }
-
-    this.play = false;
-    this.dispatch();
-
     this.player1!.party = null;
     this.player2!.party = null;
 
-    this.player1 = null;
-    this.player2 = null;
+    if (this.parties.includes(this)) {
+      const index = this.parties.indexOf(this);
+      this.parties.splice(index, 1);
+    }
   }
 
   gaveup(player: Player) {
@@ -59,7 +52,7 @@ export class Party extends Observer {
   }
 
   addShot(player: Player, x: number, y: number) {
-    if (this.turnPlayer !== player || !this.play) {
+    if (this.turnPlayer !== player) {
       return;
     }
 
@@ -84,7 +77,7 @@ export class Party extends Observer {
       player2!.emit('setShots', player2Shots, player1Shots);
 
       if (shot.variant === 'miss') {
-        this.turnPlayer = this.nextPlayer;
+        this.turnPlayer = this.nextPlayer!;
         this.turnUpdate();
       }
     }
@@ -95,50 +88,6 @@ export class Party extends Observer {
       player1!.emit('statusChange', player1!.battlefield.loser ? 'loser' : 'winner');
 
       player2!.emit('statusChange', player2!.battlefield.loser ? 'loser' : 'winner');
-    }
-  }
-
-  sendMessage(message: any) {
-    const { player1, player2 } = this;
-
-    player1!.emit('message', message);
-    player2!.emit('message', message);
-  }
-
-  reconnection(player: Player) {
-    player.emit(
-      'reconnection',
-      player.battlefield.ships.map((ship) => ({
-        size: ship.size,
-        direction: ship.direction,
-        x: ship.x,
-        y: ship.y,
-      })),
-    );
-
-    const player1Shots = this.player1!.battlefield.shots.map((shot) => ({
-      x: shot.x,
-      y: shot.y,
-      variant: shot.variant,
-    }));
-
-    const player2Shots = this.player2!.battlefield.shots.map((shot) => ({
-      x: shot.x,
-      y: shot.y,
-      variant: shot.variant,
-    }));
-
-    if (player === this.player1) {
-      player.emit('setShots', player1Shots, player2Shots);
-    } else {
-      player.emit('setShots', player2Shots, player1Shots);
-    }
-
-    player.emit('statusChange', 'play');
-    player.emit('turnUpdate', this.turnPlayer === player);
-
-    if (!this.play) {
-      player.emit('statusChange', player.battlefield.loser ? 'loser' : 'winner');
     }
   }
 }

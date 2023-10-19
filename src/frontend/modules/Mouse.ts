@@ -1,9 +1,6 @@
 export class Mouse {
   element: HTMLElement;
 
-  under = false;
-  pUnder = false;
-
   x!: number;
   y!: number;
 
@@ -23,7 +20,6 @@ export class Mouse {
       this.x = e.clientX;
       this.y = e.clientY;
       this.delta = 0;
-      this.under = true;
     };
 
     element.addEventListener('mousemove', (e) => {
@@ -39,8 +35,6 @@ export class Mouse {
     element.addEventListener('mouseleave', (e) => {
       this.tick();
       update(e);
-
-      this.under = false;
     });
 
     element.addEventListener('mousedown', (e) => {
@@ -67,14 +61,12 @@ export class Mouse {
       this.x = e.clientX;
       this.y = e.clientY;
       this.delta = e.deltaY > 0 ? 1 : -1;
-      this.under = true;
     });
   }
 
   tick() {
     this.pX = this.x;
     this.pY = this.y;
-    this.pUnder = this.under;
     this.pLeft = this.left;
     this.pDelta = this.delta;
     this.delta = 0;

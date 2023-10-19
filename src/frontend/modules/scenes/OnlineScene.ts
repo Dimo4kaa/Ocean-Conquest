@@ -1,7 +1,7 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
-import { SceneNames } from '../shared';
+import { shotItem } from '../types';
 import { addListener, isUnderPoint } from '../utils';
 
 export class OnlineScene extends Scene {
@@ -27,26 +27,7 @@ export class OnlineScene extends Scene {
       this.statusUpdate();
     });
 
-    socket.on('message', (message: string) => {
-      const div = document.createElement('div');
-      div.classList.add('app-message');
-      div.textContent = message;
-
-      const chat = document.querySelector('.app-messages')!;
-      chat.insertBefore(div, chat.firstElementChild);
-    });
-
-    socket.on('addShot', ({ x, y, variant }) => {
-      const shot = new Shot(x, y, variant);
-
-      if (this.ownTurn) {
-        this.app.opponent.addShot(shot);
-      } else {
-        this.app.player.addShot(shot);
-      }
-    });
-
-    socket.on('setShots', (ownShots, opponentShots) => {
+    socket.on('setShots', (ownShots: shotItem[], opponentShots: shotItem[]) => {
       player.removeAllShots();
 
       for (const { x, y, variant } of ownShots) {
@@ -63,14 +44,14 @@ export class OnlineScene extends Scene {
     });
 
     socket.on('challengeOpponent', (key) => {
-      history.pushState(null, '', `/${key}`);
-      alert(`Первый кто пройдет по этой ссылки будет играть с вами:\n${location.href}`);
+      alert(`Первый, кто примет бой и использует ключ, будет играть с вами: ${key}`);
     });
 
     this.statusUpdate();
   }
 
   start(variant: string, key = '') {
+    this.status = '';
     const { socket, player } = this.app;
 
     socket.emit(
@@ -89,11 +70,6 @@ export class OnlineScene extends Scene {
       socket.emit('challengeOpponent', key);
     }
 
-    const chat = document.querySelector('.app-chat')!;
-    chat.classList.remove('hidden');
-
-    document.querySelector('.app-messages')!.textContent = '';
-
     document.querySelectorAll('.app-actions').forEach((element) => element.classList.add('hidden'));
 
     const sceneActionsBar = document.querySelector('[data-scene="online"]')!;
@@ -109,14 +85,14 @@ export class OnlineScene extends Scene {
 
     this.removeEventListeners.push(
       addListener(againButton, 'click', () => {
-        this.app.start(SceneNames.Preparation);
+        this.app.start('preparation');
       }),
     );
 
     this.removeEventListeners.push(
       addListener(gaveupButton, 'click', () => {
         socket.emit('gaveup');
-        this.app.start(SceneNames.Preparation);
+        this.app.start('preparation');
       }),
     );
 
@@ -129,9 +105,6 @@ export class OnlineScene extends Scene {
     }
 
     this.removeEventListeners = [];
-
-    document.querySelector('.app-chat')!.classList.add('hidden');
-    document.querySelector('.app-messages')!.textContent = '';
   }
 
   statusUpdate() {

@@ -128,6 +128,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  align-items: center;
 }
 
 .app-action {
@@ -187,24 +188,4 @@ body {
 
 .hidden {
   display: none;
-}
-
-.app-chat {
-}
-
-.app-chatinput {
-  width: 100%;
-  height: 35px;
-  font-size: 25px;
-  text-align: left;
-}
-
-.app-messages {
-}
-
-.app-message {
-  text-align: left;
-  color: #3c3c3c;
-  font-size: 16px;
-  margin-top: 10px;
 }

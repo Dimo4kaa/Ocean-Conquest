@@ -1,8 +1,21 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Ship } from '../Ship';
-import { GameDiff, SceneNames, matrixItem, shipDatas } from '../shared';
+import { matrixItem } from '../types';
 import { addListener, getRandomSeveral, isUnderPoint } from '../utils';
+
+const shipDatas = [
+  { size: 4, direction: 'row', startX: 10, startY: 345 },
+  { size: 3, direction: 'row', startX: 10, startY: 390 },
+  { size: 3, direction: 'row', startX: 120, startY: 390 },
+  { size: 2, direction: 'row', startX: 10, startY: 435 },
+  { size: 2, direction: 'row', startX: 88, startY: 435 },
+  { size: 2, direction: 'row', startX: 167, startY: 435 },
+  { size: 1, direction: 'row', startX: 10, startY: 480 },
+  { size: 1, direction: 'row', startX: 55, startY: 480 },
+  { size: 1, direction: 'row', startX: 100, startY: 480 },
+  { size: 1, direction: 'row', startX: 145, startY: 480 },
+];
 
 export class PreparationScene extends Scene {
   draggedShip: Ship | null = null;
@@ -42,24 +55,20 @@ export class PreparationScene extends Scene {
 
     this.removeEventListeners.push(addListener(randomizeButton, 'click', () => this.randomize()));
 
-    this.removeEventListeners.push(addListener(simpleButton, 'click', () => this.startComputer(GameDiff.Simple)));
+    this.removeEventListeners.push(addListener(simpleButton, 'click', () => this.startComputer('simple')));
 
-    this.removeEventListeners.push(addListener(middleButton, 'click', () => this.startComputer(GameDiff.Middle)));
+    this.removeEventListeners.push(addListener(middleButton, 'click', () => this.startComputer('middle')));
 
-    this.removeEventListeners.push(addListener(hardButton, 'click', () => this.startComputer(GameDiff.Hard)));
+    this.removeEventListeners.push(addListener(hardButton, 'click', () => this.startComputer('hard')));
 
-    this.removeEventListeners.push(
-      addListener(randomButton, 'click', () => this.app.start(SceneNames.Online, 'random')),
-    );
+    this.removeEventListeners.push(addListener(randomButton, 'click', () => this.app.start('online', 'random')));
 
-    this.removeEventListeners.push(
-      addListener(challengeButton, 'click', () => this.app.start(SceneNames.Online, 'challenge')),
-    );
+    this.removeEventListeners.push(addListener(challengeButton, 'click', () => this.app.start('online', 'challenge')));
 
     this.removeEventListeners.push(
       addListener(takeChallengeButton, 'click', () => {
         const key = String(prompt('Ключ партии:'));
-        this.app.start(SceneNames.Online, 'challenge', key);
+        this.app.start('online', 'challenge', key);
       }),
     );
   }
@@ -169,7 +178,7 @@ export class PreparationScene extends Scene {
     }
   }
 
-  startComputer(level: GameDiff) {
+  startComputer(level: 'simple' | 'middle' | 'hard') {
     const matrix = this.app.player.matrix;
     const withoutShipItems = matrix.flat().filter((item) => !item.ship);
     let untouchables: matrixItem[] = [];
@@ -180,6 +189,6 @@ export class PreparationScene extends Scene {
     } else if (level === 'hard') {
       untouchables = getRandomSeveral(withoutShipItems, 40);
     }
-    this.app.start(SceneNames.Computer, untouchables);
+    this.app.start('computer', untouchables);
   }
 }

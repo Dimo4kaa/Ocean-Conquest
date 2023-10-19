@@ -1,7 +1,7 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
-import { SceneNames, matrixItem } from '../shared';
+import { matrixItem } from '../types';
 import { addListener, getRandomBetween, isUnderPoint } from '../utils';
 
 export class ComputerScene extends Scene {
@@ -36,13 +36,13 @@ export class ComputerScene extends Scene {
 
     this.removeEventListeners.push(
       addListener(gaveupButton, 'click', () => {
-        this.app.start(SceneNames.Preparation);
+        this.app.start('preparation');
       }),
     );
 
     this.removeEventListeners.push(
       addListener(againButton, 'click', () => {
-        this.app.start(SceneNames.Preparation);
+        this.app.start('preparation');
       }),
     );
   }
@@ -67,7 +67,7 @@ export class ComputerScene extends Scene {
       if (opponent.loser) {
         this.status.textContent = 'Вы выиграли!';
       } else {
-        this.status.textContent = 'Вы проиграли ((';
+        this.status.textContent = 'Вы проиграли';
       }
 
       document.querySelector('[data-action="gaveup"]')!.classList.add('hidden');
@@ -97,6 +97,8 @@ export class ComputerScene extends Scene {
     }
 
     if (!this.playerTurn) {
+      this.status.textContent = 'Ход комьютера:';
+
       const x = getRandomBetween(0, 9);
       const y = getRandomBetween(0, 9);
 
@@ -117,12 +119,8 @@ export class ComputerScene extends Scene {
           this.playerTurn = shot.variant === 'miss' ? true : false;
         }
       }
-    }
-
-    if (this.playerTurn) {
-      this.status.textContent = 'Ваш ход:';
     } else {
-      this.status.textContent = 'Ход комьютера:';
+      this.status.textContent = 'Ваш ход:';
     }
   }
 }

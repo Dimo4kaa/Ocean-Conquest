@@ -4,7 +4,7 @@ import { Mouse } from './Mouse';
 import { PreparationScene } from './scenes/PreparationScene';
 import { ComputerScene } from './scenes/ComputerScene';
 import { OnlineScene } from './scenes/OnlineScene';
-import { matrixItem, SceneNames } from './shared';
+import { matrixItem } from './types';
 
 export class Application {
   socket: Socket;
@@ -27,13 +27,8 @@ export class Application {
     document.querySelector('[data-side="player"]')!.append(player.root);
     document.querySelector('[data-side="opponent"]')!.append(opponent.root);
 
-    socket.on('playerCount', (n: any) => {
-      document.querySelector('[data-playersCount]')!.textContent = n;
-    });
-
-    socket.on('doubleConnection', () => {
-      alert('Socket соединение закрыто из-за подключения в другой вкладке.');
-      document.body.classList.add('hidden');
+    socket.on('playerCount', (n: number) => {
+      document.querySelector('[data-playersCount]')!.textContent = String(n);
     });
 
     this.scenes = {
@@ -44,7 +39,7 @@ export class Application {
 
     requestAnimationFrame(() => this.tick());
 
-    this.start(SceneNames.Preparation);
+    this.start('preparation');
   }
 
   tick() {
@@ -57,10 +52,10 @@ export class Application {
     this.mouse.tick();
   }
 
-  start(sceneName: SceneNames): boolean;
-  start(sceneName: SceneNames, untouchables: matrixItem[]): boolean;
-  start(sceneName: SceneNames, variant: string, key?: string): boolean;
-  start(sceneName: SceneNames, arg2?: matrixItem[] | string, key?: string): boolean {
+  start(sceneName: 'preparation'): boolean;
+  start(sceneName: 'computer', untouchables: matrixItem[]): boolean;
+  start(sceneName: 'online', variant: 'random' | 'challenge', key?: string): boolean;
+  start(sceneName: 'preparation' | 'computer' | 'online', arg2?: matrixItem[] | 'random' | 'challenge', key?: string): boolean {
     if (this.activeScene && this.activeScene.name === sceneName) {
       return false;
     }
@@ -75,13 +70,13 @@ export class Application {
     this.activeScene = scene;
 
     switch (sceneName) {
-      case SceneNames.Preparation:
+      case 'preparation':
         (scene as PreparationScene).start();
         break;
-      case SceneNames.Computer:
+      case 'computer':
         (scene as ComputerScene).start(arg2 as matrixItem[]);
         break;
-      case SceneNames.Online:
+      case 'online':
         (scene as OnlineScene).start(arg2 as string, key);
         break;
     }
