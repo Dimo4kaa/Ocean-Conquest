@@ -3,6 +3,25 @@ import { Shot } from './Shot';
 import { matrixItem } from './types';
 import { getRandomBetween, getRandomFrom } from './utils';
 
+type point = {
+  x: number;
+  y: number;
+};
+
+const angles: point[] = [
+  { x: -1, y: 1 },
+  { x: 1, y: 1 },
+  { x: -1, y: -1 },
+  { x: 1, y: -1 },
+];
+
+const sides: point[] = [
+  { x: 0, y: 1 },
+  { x: 1, y: 0 },
+  { x: 0, y: -1 },
+  { x: -1, y: 0 },
+];
+
 export class Battlefield {
   ships: Ship[] = [];
   shots: Shot[] = [];
@@ -246,6 +265,16 @@ export class Battlefield {
     if (matrix[y][x].ship) {
       shot.setVariant('wounded');
 
+      for (const angle of angles) {
+        const aX = x + angle.x;
+        const aY = y + angle.y;
+        if (this.inField(aX, aY)) {
+          const shot = new Shot(aX, aY);
+          shot.setVariant('miss');
+          this.addShot(shot);
+        }
+      }
+
       const ship = matrix[y][x].ship!;
       const dx = ship.direction === 'row';
       const dy = ship.direction === 'column';
@@ -269,6 +298,18 @@ export class Battlefield {
         for (let i = 0; i < ship!.size; i++) {
           const cx = ship!.x! + Number(dx) * i;
           const cy = ship!.y! + Number(dy) * i;
+
+          if (i === 0 || i === ship.size - 1) {
+            for (const side of sides) {
+              const sX = cx + side.x;
+              const sY = cy + side.y;
+              if (this.inField(sX, sY)) {
+                const shot = new Shot(sX, sY);
+                shot.setVariant('miss');
+                this.addShot(shot);
+              }
+            }
+          }
 
           const shot = this.shots.find((shot) => shot.x === cx && shot.y === cy);
           shot!.setVariant('killed');
