@@ -26,7 +26,70 @@ export class PreparationScene extends Scene {
 
   constructor(name: string, app: Application) {
     super(name, app);
-    this.manually();
+
+    const ships = window.localStorage.getItem('shipPlaysing');
+    if (ships) {
+      const parsedShips: Ship[] = JSON.parse(ships);
+      for (const { size, direction, startX, startY, x, y } of parsedShips) {
+        const ship = new Ship(size, direction, startX, startY);
+        console.log(ship);
+        this.app.player.addShip(ship, x!, y!);
+      }
+    } else {
+      this.manually();
+    }
+
+    const { language } = this.app;
+    const langUl = document.querySelector('.lang')!;
+    const backdrop = document.querySelector('.backdrop')!;
+
+    langUl.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains('lang__li_selected') && langUl.classList.contains('lang_opened')) {
+        this.closeLangUl();
+        return;
+      }
+      if (target.classList.contains('lang__li_selected') && !langUl.classList.contains('lang_opened')) {
+        this.openLangUl();
+        return;
+      }
+      if (target.classList.contains('lang__li') && !target.classList.contains('lang__li_selected')) {
+        const selected = langUl.querySelector('.lang__li_selected')!;
+        selected.classList.remove('lang__li_selected');
+        target.classList.add('lang__li_selected');
+
+        const lang = target.dataset.lang!;
+        window.localStorage.setItem('lang', lang);
+        language.changeLanguage(lang);
+        this.closeLangUl();
+        return;
+      }
+    });
+
+    backdrop.addEventListener('click', () => {
+      this.closeLangUl();
+    });
+
+    let startLang = window.localStorage.getItem('lang');
+    if (!startLang) {
+      startLang = navigator.language.slice(0, 2);
+    }
+
+    const firstLangElement = document.querySelector(`[data-lang=${startLang}]`) as HTMLLIElement | null;
+    if (firstLangElement) {
+      firstLangElement.classList.add('lang__li_selected');
+      language.changeLanguage(startLang);
+    } else {
+      document.querySelector('[data-lang="en"]')!.classList.add('lang__li_selected');
+      language.changeLanguage('en');
+    }
+
+    let isDark = window.localStorage.getItem('theme');
+    if (isDark === 'dark') {
+      this.switchTheme();
+    }
+    const theme = document.querySelector('.theme')!;
+    theme.addEventListener('click', () => this.switchTheme());
   }
 
   start() {
@@ -101,11 +164,58 @@ export class PreparationScene extends Scene {
 
     if (mouse.left && this.draggedShip) {
       const { left, top } = player.root.getBoundingClientRect();
-      const x = mouse.x - left - this.draggedOffsetX;
-      const y = mouse.y - top - this.draggedOffsetY;
+      const x = mouse.x - this.draggedOffsetX;
+      const y = mouse.y - this.draggedOffsetY;
 
-      this.draggedShip.div.style.left = `${x}px`;
-      this.draggedShip.div.style.top = `${y}px`;
+      const ship = this.draggedShip;
+      const shipRect = ship.div.getBoundingClientRect();
+      const { width, height } = player.cells[0][0].getBoundingClientRect();
+
+      const point = {
+        x: x + width / 2,
+        y: y + height / 2,
+      };
+
+      const cell = player.cells.flat().find((cell) => isUnderPoint(point, cell));
+      if (cell) {
+        const cellX = Number(cell!.dataset.x);
+        const cellY = Number(cell!.dataset.y);
+        const matrix = this.app.player.matrix;
+
+        const dx = ship.direction === 'row';
+        const dy = ship.direction === 'column';
+
+        let isFree = true;
+
+        for (let i = 0; i < ship.size; i++) {
+          const cx = cellX + Number(dx) * i;
+          const cy = cellY + Number(dy) * i;
+          if (cx > 9 || cy > 9) {
+            isFree = false;
+            break;
+          }
+          const item = matrix[cy][cx];
+          if (!item.free) {
+            isFree = false;
+            break;
+          }
+        }
+
+        if (isFree) {
+          ship.div.classList.add('ship_dragPlaced');
+          const cellRect = cell.getBoundingClientRect();
+          this.draggedShip.div.style.left = `${cellRect.left - left}px`;
+          this.draggedShip.div.style.top = `${cellRect.top - top}px`;
+        } else {
+          ship.div.classList.remove('ship_dragPlaced');
+          this.draggedShip.div.style.left = `${x - left}px`;
+          this.draggedShip.div.style.top = `${y - top}px`;
+        }
+      } else {
+        ship.div.classList.remove('ship_dragPlaced');
+        this.draggedShip.div.style.left = `${x - left}px`;
+        this.draggedShip.div.style.top = `${y - top}px`;
+      }
     }
 
     if (!mouse.left && this.draggedShip) {
@@ -128,6 +238,7 @@ export class PreparationScene extends Scene {
 
         player.removeShip(ship);
         player.addShip(ship, x, y);
+        ship.div.classList.remove('ship_dragPlaced');
       } else {
         player.removeShip(ship);
         player.addShip(ship);
@@ -152,6 +263,27 @@ export class PreparationScene extends Scene {
       (document.querySelector('[data-type="random"]') as HTMLButtonElement).disabled = true;
       (document.querySelector('[data-type="challenge"]') as HTMLButtonElement).disabled = true;
       (document.querySelector('[data-type="takeChallenge"]') as HTMLButtonElement).disabled = true;
+    }
+  }
+
+  openLangUl() {
+    document.querySelector('.lang')!.classList.add('lang_opened');
+    document.querySelector('.backdrop')!.classList.add('backdrop__opened');
+  }
+
+  closeLangUl() {
+    document.querySelector('.lang')!.classList.remove('lang_opened');
+    document.querySelector('.backdrop')!.classList.remove('backdrop__opened');
+  }
+
+  switchTheme() {
+    const theme = document.querySelector('.theme')!;
+    theme.classList.toggle('theme_dark');
+    document.body.classList.toggle('dark-theme');
+    if (theme.classList.contains('theme_dark')) {
+      window.localStorage.setItem('theme', 'dark');
+    } else {
+      window.localStorage.setItem('theme', 'white');
     }
   }
 
@@ -180,14 +312,14 @@ export class PreparationScene extends Scene {
 
   startComputer(level: 'simple' | 'middle' | 'hard') {
     const matrix = this.app.player.matrix;
-    const withoutShipItems = matrix.flat().filter((item) => !item.ship);
+    const freeCells = matrix.flat().filter((item) => item.free);
     let untouchables: matrixItem[] = [];
 
     if (level === 'simple') {
     } else if (level === 'middle') {
-      untouchables = getRandomSeveral(withoutShipItems, 20);
+      untouchables = getRandomSeveral(freeCells, 5);
     } else if (level === 'hard') {
-      untouchables = getRandomSeveral(withoutShipItems, 40);
+      untouchables = getRandomSeveral(freeCells, 10);
     }
     this.app.start('computer', untouchables);
   }

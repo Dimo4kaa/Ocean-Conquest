@@ -1,6 +1,7 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
+import { statusTranslations } from '../translations';
 import { matrixItem } from '../types';
 import { addListener, getRandomBetween, isUnderPoint } from '../utils';
 
@@ -56,7 +57,7 @@ export class ComputerScene extends Scene {
   }
 
   update() {
-    const { mouse, opponent, player } = this.app;
+    const { mouse, opponent, player, language } = this.app;
 
     const isEnd = opponent.loser || player.loser;
 
@@ -65,9 +66,9 @@ export class ComputerScene extends Scene {
 
     if (isEnd) {
       if (opponent.loser) {
-        this.status.textContent = 'Вы выиграли!';
+        this.status.textContent = language.getTranslate(statusTranslations, 'winner');
       } else {
-        this.status.textContent = 'Вы проиграли';
+        this.status.textContent = language.getTranslate(statusTranslations, 'loser');
       }
 
       document.querySelector('[data-action="gaveup"]')!.classList.add('hidden');
@@ -97,7 +98,7 @@ export class ComputerScene extends Scene {
     }
 
     if (!this.playerTurn) {
-      this.status.textContent = 'Ход комьютера:';
+      this.status.textContent = language.getTranslate(statusTranslations, 'compMove');
 
       const x = getRandomBetween(0, 9);
       const y = getRandomBetween(0, 9);
@@ -120,7 +121,7 @@ export class ComputerScene extends Scene {
         }
       }
     } else {
-      this.status.textContent = 'Ваш ход:';
+      this.status.textContent = language.getTranslate(statusTranslations, 'yourMove');
     }
   }
 }

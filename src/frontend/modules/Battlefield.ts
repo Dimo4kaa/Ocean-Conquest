@@ -73,7 +73,7 @@ export class Battlefield {
       const marker = document.createElement('div');
 
       marker.classList.add('marker', 'marker-column');
-      marker.textContent = 'АБВГДЕЖЗИК'[x];
+      marker.textContent = 'ABCDEFGHIJ'[x];
 
       cell.append(marker);
     }

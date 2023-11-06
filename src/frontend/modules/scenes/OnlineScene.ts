@@ -1,6 +1,7 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
+import { statusTranslations } from '../translations';
 import { shotItem } from '../types';
 import { addListener, isUnderPoint } from '../utils';
 
@@ -44,7 +45,7 @@ export class OnlineScene extends Scene {
     });
 
     socket.on('challengeOpponent', (key) => {
-      alert(`Первый, кто примет бой и использует ключ, будет играть с вами: ${key}`);
+      alert(`${this.app.language.getTranslate(statusTranslations, 'challengeOpponent')}: ${key}`);
     });
 
     this.statusUpdate();
@@ -109,24 +110,28 @@ export class OnlineScene extends Scene {
 
   statusUpdate() {
     const statusDiv = this.actionsBar.querySelector('.battlefield-status')!;
+    const { language } = this.app;
+
     switch (this.status) {
       case '':
         statusDiv.textContent = '';
         break;
       case 'randomFinding':
-        statusDiv.textContent = 'Поиск случайного соперника';
+        statusDiv.textContent = language.getTranslate(statusTranslations, 'randomFinding');
         break;
       case 'play':
-        statusDiv.textContent = this.ownTurn ? 'Ваш ход' : 'Ход соперника';
+        statusDiv.textContent = this.ownTurn
+          ? language.getTranslate(statusTranslations, 'yourMove')
+          : language.getTranslate(statusTranslations, 'oppMove');
         break;
       case 'winner':
-        statusDiv.textContent = 'Вы победили';
+        statusDiv.textContent = language.getTranslate(statusTranslations, 'winner');
         break;
       case 'loser':
-        statusDiv.textContent = 'Вы проиграли';
+        statusDiv.textContent = language.getTranslate(statusTranslations, 'loser');
         break;
       case 'waiting':
-        statusDiv.textContent = 'Ожидаем соперника';
+        statusDiv.textContent = language.getTranslate(statusTranslations, 'waiting');
         break;
     }
   }
