@@ -1,6 +1,6 @@
 import { Ship } from './Ship';
 
-export type matrixItem = {
+export type MatrixItem = {
   x: number;
   y: number;
   ship: Ship | null;
@@ -9,8 +9,13 @@ export type matrixItem = {
   wounded: boolean;
 };
 
-export type shotItem = {
+export type ShotItem = {
   x: number;
   y: number;
   variant: string;
+};
+
+export type Point = {
+  x: number;
+  y: number;
 };

@@ -1,7 +1,7 @@
 import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Ship } from '../Ship';
-import { matrixItem } from '../types';
+import { MatrixItem } from '../types';
 import { addListener, getRandomSeveral, isUnderPoint } from '../utils';
 
 const shipDatas = [
@@ -32,7 +32,6 @@ export class PreparationScene extends Scene {
       const parsedShips: Ship[] = JSON.parse(ships);
       for (const { size, direction, startX, startY, x, y } of parsedShips) {
         const ship = new Ship(size, direction, startX, startY);
-        console.log(ship);
         this.app.player.addShip(ship, x!, y!);
       }
     } else {
@@ -44,15 +43,29 @@ export class PreparationScene extends Scene {
     const backdrop = document.querySelector('.backdrop')!;
 
     langUl.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
+      let target = event.target as HTMLElement;
+
+      while (target !== langUl) {
+        if (target.classList.contains('lang__li')) {
+          break;
+        }
+        target = target.parentElement!;
+      }
+
+      if (target === langUl) {
+        return;
+      }
+
       if (target.classList.contains('lang__li_selected') && langUl.classList.contains('lang_opened')) {
         this.closeLangUl();
         return;
       }
+
       if (target.classList.contains('lang__li_selected') && !langUl.classList.contains('lang_opened')) {
         this.openLangUl();
         return;
       }
+
       if (target.classList.contains('lang__li') && !target.classList.contains('lang__li_selected')) {
         const selected = langUl.querySelector('.lang__li_selected')!;
         selected.classList.remove('lang__li_selected');
@@ -107,6 +120,7 @@ export class PreparationScene extends Scene {
 
     const manuallyButton = document.querySelector('[data-action="manually"]')!;
     const randomizeButton = document.querySelector('[data-action="randomize"]')!;
+    const saveButton = document.querySelector('[data-action="save"]')!;
     const simpleButton = document.querySelector('[data-computer="simple"]')!;
     const middleButton = document.querySelector('[data-computer="middle"]')!;
     const hardButton = document.querySelector('[data-computer="hard"]')!;
@@ -117,6 +131,8 @@ export class PreparationScene extends Scene {
     this.removeEventListeners.push(addListener(manuallyButton, 'click', () => this.manually()));
 
     this.removeEventListeners.push(addListener(randomizeButton, 'click', () => this.randomize()));
+
+    this.removeEventListeners.push(addListener(saveButton, 'click', () => this.saveShipPlaysing()));
 
     this.removeEventListeners.push(addListener(simpleButton, 'click', () => this.startComputer('simple')));
 
@@ -130,8 +146,10 @@ export class PreparationScene extends Scene {
 
     this.removeEventListeners.push(
       addListener(takeChallengeButton, 'click', () => {
-        const key = String(prompt('Ключ партии:'));
-        this.app.start('online', 'challenge', key);
+        const key = prompt('Ключ партии:');
+        if (key) {
+          this.app.start('online', 'challenge', key);
+        }
       }),
     );
   }
@@ -168,7 +186,6 @@ export class PreparationScene extends Scene {
       const y = mouse.y - this.draggedOffsetY;
 
       const ship = this.draggedShip;
-      const shipRect = ship.div.getBoundingClientRect();
       const { width, height } = player.cells[0][0].getBoundingClientRect();
 
       const point = {
@@ -256,6 +273,7 @@ export class PreparationScene extends Scene {
       (document.querySelector('[data-type="random"]') as HTMLButtonElement).disabled = false;
       (document.querySelector('[data-type="challenge"]') as HTMLButtonElement).disabled = false;
       (document.querySelector('[data-type="takeChallenge"]') as HTMLButtonElement).disabled = false;
+      (document.querySelector('[data-action="save"]') as HTMLButtonElement).disabled = false;
     } else {
       (document.querySelector('[data-computer="simple"]') as HTMLButtonElement).disabled = true;
       (document.querySelector('[data-computer="middle"]') as HTMLButtonElement).disabled = true;
@@ -263,26 +281,29 @@ export class PreparationScene extends Scene {
       (document.querySelector('[data-type="random"]') as HTMLButtonElement).disabled = true;
       (document.querySelector('[data-type="challenge"]') as HTMLButtonElement).disabled = true;
       (document.querySelector('[data-type="takeChallenge"]') as HTMLButtonElement).disabled = true;
+      (document.querySelector('[data-action="save"]') as HTMLButtonElement).disabled = true;
     }
   }
 
   openLangUl() {
     document.querySelector('.lang')!.classList.add('lang_opened');
-    document.querySelector('.backdrop')!.classList.add('backdrop__opened');
+    document.querySelector('.backdrop')!.classList.add('backdrop_opened');
   }
 
   closeLangUl() {
     document.querySelector('.lang')!.classList.remove('lang_opened');
-    document.querySelector('.backdrop')!.classList.remove('backdrop__opened');
+    document.querySelector('.backdrop')!.classList.remove('backdrop_opened');
   }
 
   switchTheme() {
-    const theme = document.querySelector('.theme')!;
-    theme.classList.toggle('theme_dark');
-    document.body.classList.toggle('dark-theme');
-    if (theme.classList.contains('theme_dark')) {
+    const theme = document.querySelector('.theme')! as HTMLImageElement;
+    const body = document.body;
+    body.classList.toggle('dark-theme');
+    if (body.classList.contains('dark-theme')) {
+      theme.src = './assets/sun.png';
       window.localStorage.setItem('theme', 'dark');
     } else {
+      theme.src = './assets/moon.png';
       window.localStorage.setItem('theme', 'white');
     }
   }
@@ -310,10 +331,14 @@ export class PreparationScene extends Scene {
     }
   }
 
+  saveShipPlaysing() {
+    window.localStorage.setItem('shipPlaysing', JSON.stringify(this.app.player.ships));
+  }
+
   startComputer(level: 'simple' | 'middle' | 'hard') {
     const matrix = this.app.player.matrix;
     const freeCells = matrix.flat().filter((item) => item.free);
-    let untouchables: matrixItem[] = [];
+    let untouchables: MatrixItem[] = [];
 
     if (level === 'simple') {
     } else if (level === 'middle') {

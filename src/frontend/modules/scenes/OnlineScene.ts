@@ -2,7 +2,7 @@ import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
 import { statusTranslations } from '../translations';
-import { shotItem } from '../types';
+import { ShotItem } from '../types';
 import { addListener, isUnderPoint } from '../utils';
 
 export class OnlineScene extends Scene {
@@ -28,7 +28,7 @@ export class OnlineScene extends Scene {
       this.statusUpdate();
     });
 
-    socket.on('setShots', (ownShots: shotItem[], opponentShots: shotItem[]) => {
+    socket.on('setShots', (ownShots: ShotItem[], opponentShots: ShotItem[]) => {
       player.removeAllShots();
 
       for (const { x, y, variant } of ownShots) {

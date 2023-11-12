@@ -1,21 +1,16 @@
 import { Ship } from './Ship';
 import { Shot } from './Shot';
-import { matrixItem } from './types';
+import { MatrixItem, Point } from './types';
 import { getRandomBetween, getRandomFrom } from './utils';
 
-type point = {
-  x: number;
-  y: number;
-};
-
-const angles: point[] = [
+const angles: Point[] = [
   { x: -1, y: 1 },
   { x: 1, y: 1 },
   { x: -1, y: -1 },
   { x: 1, y: -1 },
 ];
 
-const sides: point[] = [
+const sides: Point[] = [
   { x: 0, y: 1 },
   { x: 1, y: 0 },
   { x: 0, y: -1 },
@@ -100,13 +95,13 @@ export class Battlefield {
   }
 
   get matrix() {
-    const matrix: matrixItem[][] = [];
+    const matrix: MatrixItem[][] = [];
 
     for (let y = 0; y < 10; y++) {
       const row = [];
 
       for (let x = 0; x < 10; x++) {
-        const item: matrixItem = {
+        const item: MatrixItem = {
           x,
           y,
           ship: null,

@@ -63,6 +63,14 @@ export const preparationTranslations = [
     fr: 'Placer les navires aléatoirement',
     ru: 'Расставить корабли случайно',
   },
+  {
+    en: 'Save ship placement',
+    ch: '保存船只位置',
+    es: 'Guardar ubicación de los barcos',
+    ar: 'حفظ توزيع السفن',
+    fr: 'Enregistrer le placement des navires',
+    ru: 'Сохранить расстановку кораблей',
+  },
 ];
 
 export const gameTranslations = [

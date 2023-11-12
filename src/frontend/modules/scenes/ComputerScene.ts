@@ -2,11 +2,11 @@ import { Application } from '../Application';
 import { Scene } from '../Scene';
 import { Shot } from '../Shot';
 import { statusTranslations } from '../translations';
-import { matrixItem } from '../types';
+import { MatrixItem } from '../types';
 import { addListener, getRandomBetween, isUnderPoint } from '../utils';
 
 export class ComputerScene extends Scene {
-  untouchables: matrixItem[] = [];
+  untouchables: MatrixItem[] = [];
   playerTurn = true;
   status: HTMLDivElement;
   removeEventListeners: (() => void)[] = [];
@@ -16,7 +16,7 @@ export class ComputerScene extends Scene {
     this.status = document.querySelector('.battlefield-status')!;
   }
 
-  start(untouchables: matrixItem[]) {
+  start(untouchables: MatrixItem[]) {
     const { opponent } = this.app;
 
     document.querySelectorAll('.app-actions').forEach((element) => element.classList.add('hidden'));

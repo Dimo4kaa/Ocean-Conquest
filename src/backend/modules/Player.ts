@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import { Battlefield } from './Battlefield.js';
 import { Party } from './Party.js';
-import { shotItem } from './types.js';
+import { ShotItem } from './types.js';
 
 export class Player {
   battlefield = new Battlefield();
@@ -14,8 +14,8 @@ export class Player {
 
   emit(eventName: 'turnUpdate', ownTurn: boolean): boolean;
   emit(eventName: 'statusChange', status: 'play' | 'winner' | 'loser' | 'randomFinding'): boolean;
-  emit(eventName: 'setShots', ownShots1: shotItem[], ownShots2: shotItem[]): boolean;
-  emit(eventName: string, payload1: boolean | string | shotItem[], payLoad2?: shotItem[]) {
+  emit(eventName: 'setShots', ownShots1: ShotItem[], ownShots2: ShotItem[]): boolean;
+  emit(eventName: string, payload1: boolean | string | ShotItem[], payLoad2?: ShotItem[]) {
     if (this.socket && this.socket.connected) {
       switch (eventName) {
         case 'turnUpdate':

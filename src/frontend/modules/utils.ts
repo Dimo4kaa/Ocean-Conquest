@@ -1,3 +1,5 @@
+import { Point } from "./types";
+
 export function getRandomBetween(min: number, max: number) {
   return min + Math.floor(Math.random() * (max - min + 1));
 }
@@ -7,7 +9,7 @@ export function getRandomFrom<T>(...args: T[]): T {
   return args[index];
 }
 
-export function isUnderPoint<T extends { x: number; y: number }>(point: T, element: HTMLElement) {
+export function isUnderPoint<T extends Point>(point: T, element: HTMLElement) {
   const { left, top, width, height } = element.getBoundingClientRect();
   const { x, y } = point;
 

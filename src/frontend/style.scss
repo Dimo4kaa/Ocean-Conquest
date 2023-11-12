@@ -3,19 +3,20 @@
   padding: 0;
   user-select: none;
 }
+
 :root {
   --bg-color: #ffffff;
+  --bg-shot: #ffffff;
   --primary-text-color: #0f0f0f;
   --bg-lang: #dddddd;
-  --bg-shot: #ffffff;
   --td-border-color: rgba(6, 25, 247, 0.15);
 }
 
 .dark-theme {
   --bg-color: #0f0f0f;
-  --primary-text-color: #f1f1f1;
-  --bg-lang: rgba(255, 255, 255, 0.1);
   --bg-shot: #0f0f0f;
+  --primary-text-color: #f1f1f1;
+  --bg-lang: rgba(40, 40, 40, 1);
   --td-border-color: rgba(6, 25, 247, 0.35);
 }
 
@@ -34,11 +35,11 @@ body {
 .app-header {
   position: relative;
   text-align: center;
-  padding-top: 15px;
+  padding-top: 30px;
 }
 
 .app-body {
-  margin-top: 50px;
+  margin-top: 60px;
   margin-bottom: 50px;
   display: flex;
   flex-direction: row;
@@ -148,6 +149,9 @@ body {
   width: 210px;
   padding: 10px;
   margin-bottom: 10px;
+  &_indentation {
+    margin-bottom: 20px;
+  }
 }
 
 .shot {
@@ -161,7 +165,6 @@ body {
 }
 
 .shot-missed {
-  /* color: gray; */
   color: 'black';
 }
 
@@ -205,7 +208,7 @@ body {
 
 .lang {
   position: absolute;
-  top: 54px;
+  top: 80px;
   right: 0;
   padding: 5px 0;
   border-radius: 5px;
@@ -213,7 +216,7 @@ body {
   cursor: pointer;
   z-index: 2;
   &_opened &__li {
-    display: list-item;
+    display: flex;
   }
   &::before {
     content: '';
@@ -229,60 +232,28 @@ body {
   &:not(.lang_opened)::before {
     display: none;
   }
-  // &__img {
-  //   float: left;
-  //   width: 20px;
-  //   height: 20px;
-  //   background-image: url(./assets/icons8-RUS.png);
-  //   background-size: contain;
-  //   background-repeat: no-repeat;
-  // }
-  // &__title {
-  //   margin-left: 5px;
-  // }
-  // &::after {
-  //   content: '▼';
-  //   font-size: 12px;
-  // }
   &__li {
     list-style-type: none;
     background-position: 10px center;
     background-size: 26px;
     background-repeat: no-repeat;
-    /* padding-left: 24px; */
-    /* margin: 10px 0; */
-    padding: 5px 10px 5px 40px;
-    display: none;
+    padding: 5px 10px 5px 10px;
     white-space: nowrap;
-    &_GBR {
-      background-image: url(./assets/GBR.png);
-    }
-    &_CHN {
-      background-image: url(./assets/CHN.png);
-    }
-    &_ESP {
-      background-image: url(./assets/ESP.png);
-    }
-    &_SAU {
-      background-image: url(./assets/SAU.png);
-    }
-    &_FRA {
-      background-image: url(./assets/FRA.png);
-    }
-    &_RUS {
-      background-image: url(./assets/RUS.png);
-    }
+    display: flex;
+    display: none;
+    gap: 10px;
+    align-items: center;
     &_selected {
       padding-right: 10px;
       position: absolute;
-      display: block;
+      display: flex;
       top: -36px;
       right: 5px;
     }
   }
-  // &__save {
-  //   content: '▲';
-  // }
+  &__flag {
+    width: 25px;
+  }
 }
 
 .backdrop {
@@ -296,7 +267,7 @@ body {
   overflow: auto;
   background-color: rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.4);
-  &__opened {
+  &_opened {
     display: block;
   }
 }
@@ -304,16 +275,15 @@ body {
 .theme {
   position: absolute;
   left: 0;
-  top: 20px;
+  top: 45px;
   height: 30px;
   width: 30px;
   cursor: pointer;
-  background-position: center center;
-  background-size: 30px;
-  background-repeat: no-repeat;
-  background-image: url('./assets/moon.png');
-}
-
-.theme_dark {
-  background-image: url('./assets/sun.png');
+  // background-position: center center;
+  // background-size: 30px;
+  // background-repeat: no-repeat;
+  // background-image: url('./assets/moon.png');
+  // &_dark {
+  //   background-image: url('./assets/sun.png');
+  // }
 }
