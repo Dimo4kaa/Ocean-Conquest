@@ -44,7 +44,7 @@ export class OnlineScene extends Scene {
       }
     });
 
-    socket.on('challengeOpponent', (key) => {
+    socket.on('challengeOpponent', (key: string) => {
       alert(`${this.app.language.getTranslate(statusTranslations, 'challengeOpponent')}: ${key}`);
     });
 

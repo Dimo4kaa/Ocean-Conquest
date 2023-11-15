@@ -1,24 +1,25 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "lib": ["ES6", "DOM"],
-    "module": "CommonJS",
     "rootDir": "./",
+    "outDir": "../../dist/",
+    "target": "ES6",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "allowJs": true,
-    "sourceMap": true,
-    "outDir": "../../dist",
     "removeComments": true,
     "strict": true,
     "noImplicitAny": true,
-
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
   "include": ["./**/*"],
   "exclude": ["node_modules"],
-  "lib": ["esnext"],
   "ts-node": {
-    "esm": true
+    "esm": true,
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
   }
 }

@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "lib": ["ES6", "DOM"],
-    "module": "NodeNext",
     "rootDir": "./",
-    "allowJs": true,
-    "sourceMap": true,
     "outDir": "../../dist",
+    "target": "ES6",
+    "module": "NodeNext",
+    "allowJs": true,
+    // "sourceMap": true,
     "removeComments": true,
     "strict": true,
     "noImplicitAny": true,
-
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
