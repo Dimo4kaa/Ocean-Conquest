@@ -10,7 +10,7 @@ const pm = new PartyManager();
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
-const port = 5000;
+const port = process.env.PORT || 5000;;
 app.set('trust proxy', 1);
 app.use(express.static(__dirname));
 server.listen(port, () => {
